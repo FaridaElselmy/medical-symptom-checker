@@ -1,7 +1,8 @@
 from pydantic import BaseModel, EmailStr, Field, validator, ConfigDict
 from typing import Optional
 from datetime import datetime, timezone, timedelta
-
+from typing import List, Optional
+from pydantic import BaseModel
 
 
 class UserSignup(BaseModel):
@@ -35,3 +36,19 @@ class MedicalHistory(BaseModel):
     
 class ChatRequest(BaseModel):
     prompt: str
+
+
+
+class MedicalHistoryResponse(BaseModel):
+    id: str
+    condition: str
+    diagnosis_date: Optional[str] = None
+    treatment: Optional[str] = None
+    notes: Optional[str] = None
+
+class UserWithHistoryResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    dateJoined: str
+    histories: List[MedicalHistoryResponse] = []
