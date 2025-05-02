@@ -1,6 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from models import UserSignup, MedicalHistory, UserLogin
+from models import UserSignup, MedicalHistory, UserLogin, UserWithHistoryResponse
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, status, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +10,8 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 
+from fastapi import HTTPException, Depends
+from typing import List, Dict, Any
 import os
 import logging
 import tempfile
@@ -22,6 +24,9 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 # from utils.chatbot import generate_reply  # 👈 adjust path if needed
 
+from fastapi import HTTPException, Depends
+from typing import List, Dict, Any
+from bson import ObjectId
 # Load environment variables
 load_dotenv()
 
@@ -288,11 +293,32 @@ async def get_dashboard_history(current_user: Dict[str, Any] = Depends(get_curre
 
 
 
-# @app.post("/chat")
-# def chat_endpoint(query: str = Body(...)):
-#     try:
-#         reply = generate_reply(query)
-#         return {"reply": reply}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Error generating reply: {e}")
+@app.get("/users")
+async def get_all_users(current_user: Dict[str, Any] = Depends(get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
 
+    all_users = users.find()
+    user_list = []
+    for user in all_users:
+        user_histories = list(history_collection.find({"user_id": user["_id"]}))
+        formatted_histories = []
+        for h in user_histories:
+            prediction = h.get("prediction", {})
+            formatted_histories.append({
+                "id": str(h["_id"]),
+                "condition": prediction.get("disease", ""),
+                "confidence": prediction.get("confidence", 0),
+                "label": prediction.get("label"),
+                "success": prediction.get("success", False),
+                "created_at": h.get("created_at").strftime("%Y-%m-%d %H:%M:%S") if h.get("created_at") else None
+            })
+
+        user_list.append({
+            "id": str(user["_id"]),
+            "name": f"{user.get('firstName', '')} {user.get('lastName', '')}".strip(),
+            "email": user.get("email", ""),
+            "dateJoined": user.get("created_at").strftime("%b %d, %Y") if user.get("created_at") else "N/A",
+            "histories": formatted_histories
+        })
+    return user_list

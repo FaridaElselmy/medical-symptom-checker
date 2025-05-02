@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+<<<<<<< HEAD
 pymongo
 pillow
 transformers
@@ -12,3 +13,11 @@ python-jose
 python-jose[cryptography]
 passlib[bcrypt]
 opencv-python
+=======
+pillow
+numpy
+tensorflow
+pymongo
+python-multipart
+
+>>>>>>> 5e862f5 (Initial commit)
