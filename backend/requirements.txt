@@ -1,8 +1,15 @@
 fastapi
 uvicorn
-pillow
-numpy
-tensorflow
 pymongo
-python-multipart
+pillow
+transformers
+torch
+python-dotenv
+numpy
 
+python-multipart
+email-validator
+python-jose
+python-jose[cryptography]
+passlib[bcrypt]
+opencv-python

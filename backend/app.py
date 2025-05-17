@@ -13,6 +13,10 @@ import os
 import logging
 import tempfile
 from utils.predict import predict_skin_disease
+import requests
+import tempfile
+from fastapi import UploadFile, File, Depends, HTTPException
+from datetime import datetime, timezone
 # Load environment variables
 load_dotenv()
 
@@ -170,6 +174,7 @@ async def read_users_me(current_user: Dict[str, Any] = Depends(get_current_user)
         "role": current_user.get("role", "patient")
     }
 
+
 @app.post("/predict")
 async def predict(
     file: UploadFile = File(...),
@@ -181,37 +186,38 @@ async def predict(
             content = await file.read()
             temp_file.write(content)
             temp_path = temp_file.name
-        
-        # Get prediction - this now returns a dict with native Python types
-        result = predict_skin_disease(temp_path)
-        
+
+        # Send file to Hugging Face Space (proxy call)
+        with open(temp_path, "rb") as img_file:
+            files = {"file": (file.filename, img_file, file.content_type)}
+            response = requests.post("https://huggingface.co/spaces/Faridaaaa/medi_model", files=files)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Prediction failed at remote model")
+
+        result = response.json()
+
         if not result.get("success", False):
-            raise HTTPException(
-                status_code=400,
-                detail=result.get("error", "Prediction failed")
-            )
-        
-        # Save to history
+            raise HTTPException(status_code=400, detail=result.get("error", "Remote model error"))
+
+        # Save to history (just like before)
         history_record = {
             "user_id": current_user["_id"],
             "prediction": result,
             "created_at": datetime.now(timezone.utc)
         }
         history_collection.insert_one(history_record)
-        
+
         return result
-        
+
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Server error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
     finally:
-        # Cleanup temp file
         if 'temp_path' in locals() and os.path.exists(temp_path):
             os.unlink(temp_path)
+
 @app.post("/save-history")
 async def save_history(
     history: MedicalHistory,
