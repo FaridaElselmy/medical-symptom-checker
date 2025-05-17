@@ -6,7 +6,6 @@ transformers
 torch
 python-dotenv
 numpy
-
 python-multipart
 email-validator
 python-jose
