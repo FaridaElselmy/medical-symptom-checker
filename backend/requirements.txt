@@ -13,3 +13,4 @@ python-jose
 python-jose[cryptography]
 passlib[bcrypt]
 opencv-python
+torchvision
