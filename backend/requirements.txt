@@ -10,4 +10,6 @@ tensorflow
 python-multipart
 email-validator
 python-jose
-
+python-jose[cryptography]
+passlib[bcrypt]
+opencv-python
