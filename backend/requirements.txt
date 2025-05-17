@@ -6,11 +6,11 @@ transformers
 torch
 python-dotenv
 numpy
-tensorflow
+
 python-multipart
 email-validator
 python-jose
 python-jose[cryptography]
 passlib[bcrypt]
 opencv-python
-torchvision
+
