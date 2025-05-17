@@ -1,8 +1,11 @@
 fastapi
 uvicorn
+pymongo
 pillow
+transformers
+torch
+python-dotenv
 numpy
 tensorflow
-pymongo
 python-multipart
 
