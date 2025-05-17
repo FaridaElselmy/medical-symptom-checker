@@ -8,4 +8,4 @@ python-dotenv
 numpy
 tensorflow
 python-multipart
-
+email-validator
