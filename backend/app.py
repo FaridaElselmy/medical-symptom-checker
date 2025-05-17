@@ -27,16 +27,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # MongoDB connection
-uri = "mongodb+srv://medatabase:4202025@symptom-main.nwuw0td.mongodb.net/?retryWrites=true&w=majority&appName=symptom-main"
+uri = os.getenv("MONGO_URI")
+
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client["database"]
 users = db["users"]
 history_collection = db["history"]
+try:
+    client.admin.command('ping')
+    print("✅ MongoDB Atlas connection established.")
+except Exception as e:
+    print(f"❌ Failed to connect to MongoDB Atlas: {e}")
 
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["*"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -265,3 +271,4 @@ async def get_dashboard_history(current_user: Dict[str, Any] = Depends(get_curre
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )       
+    
