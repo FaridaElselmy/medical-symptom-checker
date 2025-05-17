@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, ChangeEvent } from "react"
+import { useState, useRef, ChangeEvent } from "react"
 import { Upload, X, UploadCloud } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,9 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const [dragging, setDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+
+  // ✅ This ref is bound to the hidden input
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
@@ -41,60 +44,38 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const handleFiles = (files: FileList) => {
     const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
     setImages((prev) => [...prev, ...newImages])
-    
-    // Process the first file for prediction
+
     if (files.length > 0) {
       processImageForPrediction(files[0])
     }
   }
-  // Add this utility function
-async function refreshToken() {
-  try {
-    const response = await fetch('http://localhost:8000/refresh-token', {
-      method: 'POST',
-      credentials: 'include'
-    });
-    
-    if (!response.ok) throw new Error("Refresh failed");
-    const { access_token } = await response.json();
-    localStorage.setItem('access_token', access_token);
-    return access_token;
-  } catch (error) {
-    console.error("Token refresh failed:", error);
-    localStorage.removeItem('access_token');
-    throw error;
-  }
-}
-
 
   const processImageForPrediction = async (file: File) => {
     setIsLoading(true)
     setUploadProgress(0)
-    
+
     try {
       const formData = new FormData()
-      formData.append('file', file)
+      formData.append("file", file)
 
-      const response = await fetch('http://localhost:8000/predict', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8000/predict", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
         },
         body: formData
       })
-      console.log(response)
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
         throw new Error(
-          errorData?.detail || 
-          `Upload failed with status ${response.status}: ${response.statusText}`
+          errorData?.detail ||
+            `Upload failed with status ${response.status}: ${response.statusText}`
         )
       }
-      
+
       const result = await response.json()
       onUploadComplete(result)
-      
     } catch (error) {
       console.error("Upload error:", error)
       alert(`Upload failed: ${error instanceof Error ? error.message : String(error)}`)
@@ -110,7 +91,9 @@ async function refreshToken() {
         <Label className="text-secondary">Upload Photos of Allergic Reactions or Skin Conditions</Label>
         <div className="grid grid-cols-1 gap-4">
           <div
-            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${dragging ? "border-primary bg-accent" : "hover:bg-muted"}`}
+            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${
+              dragging ? "border-primary bg-accent" : "hover:bg-muted"
+            }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -138,25 +121,32 @@ async function refreshToken() {
                   </>
                 )}
               </div>
+
+              {/* ✅ Button that triggers the file input */}
+              <Button
+                variant="outline"
+                type="button"
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+                onClick={() => {
+                  console.log("Clicking file input...");
+                  console.log("Ref value:", fileInputRef.current);
+                  fileInputRef.current?.click();
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Select Files"}
+              </Button>
+
+              {/* ✅ Hidden file input */}
               <input
                 type="file"
                 accept="image/*"
                 multiple
+                ref={fileInputRef}
                 className="hidden"
-                id="image-upload"
                 onChange={handleImageUpload}
                 disabled={isLoading}
               />
-              <Label htmlFor="image-upload" className="cursor-pointer">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Processing..." : "Select Files"}
-                </Button>
-              </Label>
             </div>
           </div>
 
