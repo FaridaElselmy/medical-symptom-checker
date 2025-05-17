@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
       try {
         // Verify token
-        const verifyResponse = await fetch('http://localhost:8000/verify-token', {
+        const verifyResponse = await fetch('https://medical-backend.onrender.com/verify-token', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
