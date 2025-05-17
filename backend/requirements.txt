@@ -9,3 +9,5 @@ numpy
 tensorflow
 python-multipart
 email-validator
+python-jose
+
