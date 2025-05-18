@@ -9,6 +9,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
+
 import os
 import logging
 import tempfile
@@ -17,6 +18,10 @@ import requests
 import tempfile
 from fastapi import UploadFile, File, Depends, HTTPException
 from datetime import datetime, timezone
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+# from utils.chatbot import generate_reply  # 👈 adjust path if needed
+
 # Load environment variables
 load_dotenv()
 
@@ -186,35 +191,35 @@ async def predict(
             content = await file.read()
             temp_file.write(content)
             temp_path = temp_file.name
-
-        # Send file to Hugging Face Space (proxy call)
-        with open(temp_path, "rb") as img_file:
-            files = {"file": (file.filename, img_file, file.content_type)}
-            response = requests.post("https://huggingface.co/spaces/Faridaaaa/medi_model", files=files)
-
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Prediction failed at remote model")
-
-        result = response.json()
-
+        
+        # Get prediction - this now returns a dict with native Python types
+        result = predict_skin_disease(temp_path)
+        
         if not result.get("success", False):
-            raise HTTPException(status_code=400, detail=result.get("error", "Remote model error"))
-
-        # Save to history (just like before)
+            raise HTTPException(
+                status_code=400,
+                detail=result.get("error", "Prediction failed")
+            )
+        
+        # Save to history
         history_record = {
             "user_id": current_user["_id"],
             "prediction": result,
             "created_at": datetime.now(timezone.utc)
         }
         history_collection.insert_one(history_record)
-
+        
         return result
-
+        
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Server error: {str(e)}"
+        )
     finally:
+        # Cleanup temp file
         if 'temp_path' in locals() and os.path.exists(temp_path):
             os.unlink(temp_path)
 
@@ -278,3 +283,16 @@ async def get_dashboard_history(current_user: Dict[str, Any] = Depends(get_curre
             detail=str(e)
         )       
     
+
+
+
+
+
+# @app.post("/chat")
+# def chat_endpoint(query: str = Body(...)):
+#     try:
+#         reply = generate_reply(query)
+#         return {"reply": reply}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error generating reply: {e}")
+
