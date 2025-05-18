@@ -5,18 +5,31 @@ import os
 
 from transformers import ViTForImageClassification
 
-# Define class labels (8)
 class_labels = [
-    'Actinic Keratosis', 'Basal Cell Carcinoma', 'Benign Keratosis',
-    'Dermatofibroma', 'Melanocytic Nevus', 'Melanoma',
-    'Vascular Lesion', 'Warts/Molluscum'
+    'Enfeksiyonel',
+    'Ekzama', 
+    'Akne',
+    'Pigment',
+    'Benign',
+    'Malign',
+    'Acne',
+    'Actinic Keratosis',
+    'Basal Cell Carcinoma',
+    'Benign Keratosis',
+    'Dermatofibroma',
+    'Melanocytic Nevus',
+    'Melanoma',
+    'Vascular Lesion',
+    'Warts/Molluscum',
+
 ]
+
 
 # Define the model loading function
 def build_model():
     model = ViTForImageClassification.from_pretrained(
         os.path.join(os.path.dirname(__file__), "..", "vitweights"),  # 👈 Use local relative path
-        num_labels=8
+        num_labels=15
     )
     return model
 

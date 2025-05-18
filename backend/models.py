@@ -32,3 +32,6 @@ class MedicalHistory(BaseModel):
     diagnosis_date: Optional[datetime] = None
     treatment: Optional[str] = None
     notes: Optional[str] = None
+    
+class ChatRequest(BaseModel):
+    prompt: str
