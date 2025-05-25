@@ -71,7 +71,8 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="hidden md:flex border-primary text-primary hover:bg-primary hover:text-white"
+                      className="flex border-primary text-primary hover:bg-primary hover:text-white"
+
                     >
                       Sign In
                     </Button>
