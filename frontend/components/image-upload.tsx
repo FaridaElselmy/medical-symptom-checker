@@ -12,7 +12,7 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const [isLoading, setIsLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
-  //  This ref is bound to the hidden input
+  // ✅ This ref is bound to the hidden input
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const removeImage = (index: number) => {
