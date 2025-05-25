@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
       try {
         // Verify token
-        const verifyResponse = await fetch('http://localhost:8000/verify-token', {
+        const verifyResponse = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/verify-token', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -56,7 +56,7 @@ export default function DashboardPage() {
         }
 
         // Fetch medical history
-        const historyResponse = await fetch('http://localhost:8000/dashboard-history', {
+        const historyResponse = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/dashboard-history', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

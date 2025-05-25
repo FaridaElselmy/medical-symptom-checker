@@ -70,7 +70,7 @@ export default function UsersManagement() {
       try {
         const token = localStorage.getItem("access_token") || "";
 
-        const response = await fetch("http://localhost:8000/users", {
+        const response = await fetch("https://faridaaaa-medical-diagnosis-api.hf.space/users", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
