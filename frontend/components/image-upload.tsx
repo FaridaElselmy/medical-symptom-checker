@@ -58,7 +58,7 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
       const formData = new FormData()
       formData.append("file", file)
 
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch("https://faridaaaa-medical-diagnosis-api.hf.space/predict", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`
