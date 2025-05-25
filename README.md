@@ -26,9 +26,9 @@ medical-symptom-checker/
 
 ---
 
-## 💻 How to Set Up on Another Laptop
+##  How to Set Up on Another Laptop
 
-### 1. 📦 Clone the Repository
+### 1.  Clone the Repository
 
 ```bash
 git clone https://github.com/FaridaElselmy/medical-symptom-checker.git
@@ -37,7 +37,7 @@ cd medical-symptom-checker
 
 ---
 
-### 2. ⚙️ Backend Setup (FastAPI + TensorFlow)
+### 2.  Backend Setup (FastAPI + TensorFlow)
 
 > 🐍 Requires Python 3.9+ and pip
 
@@ -67,7 +67,7 @@ Go to: [http://localhost:8000/docs](http://localhost:8000/docs) to test the API 
 
 ---
 
-### 3. 🌐 Frontend Setup (Next.js)
+### 3.  Frontend Setup (Next.js)
 
 > 📦 Requires Node.js (v16+) and npm
 
@@ -81,7 +81,7 @@ Open the frontend in your browser: [http://localhost:3000](http://localhost:3000
 
 ---
 
-### 4. 🧠 Model Files
+### 4.  Model Files
 
 Model files (e.g. `.h5`, `.pb`) are not pushed to GitHub to avoid large repo size.
 👉 Download the model from your cloud storage (e.g. Google Drive, Hugging Face, etc.) and place it in:
@@ -94,7 +94,7 @@ Make sure your `main.py` loads it from the correct path.
 
 ---
 
-### 5. 🔐 Environment Variables
+### 5.  Environment Variables
 
 Create a `.env` file **if needed**:
 
@@ -112,13 +112,13 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ---
 
-## 🙅 What’s Ignored
+##  What’s Ignored
 
 The following folders/files are intentionally excluded from Git:
 
 * `node_modules/`
 * `venv/`
-* `*.h5`, `*.tflite`, `.env`, etc.
+* `*.pth`, `*.tflite`, `.env`, etc.
 
 See `.gitignore` for full details.
 
@@ -126,6 +126,6 @@ See `.gitignore` for full details.
 
 ## ✨ Author
 
-Made with ❤️ by [Farida Elselmy](https://github.com/FaridaElselmy)
+Made by [Farida Elselmy](https://github.com/FaridaElselmy) & SaraAyman
 
 
