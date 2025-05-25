@@ -33,6 +33,7 @@ export default function LoginPage() {
           })
           
           if (response.ok) {
+            
             router.push("/dashboard")
           } else {
             localStorage.removeItem("access_token")

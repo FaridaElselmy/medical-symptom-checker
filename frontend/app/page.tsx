@@ -7,7 +7,7 @@ import { Logo } from "@/components/logo"
 import { ServiceCard } from "@/components/service-card"
 import { FeatureCard } from "@/components/feature-card"
 import { Input } from "@/components/ui/input"
-
+import { HealthAssistantChat } from "@/components/health-assistant-chat"
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -98,8 +98,28 @@ export default function Home() {
           </div>
         </div>
       </header>
-
       <main className="flex-1">
+        {/* Health Assistant Chat Section */}
+        <section className="py-12 bg-gradient-to-b from-white to-accent">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="md:w-1/2">
+                <h2 className="text-3xl font-bold text-secondary mb-4">Get Instant Health Guidance</h2>
+                <p className="text-gray-600 mb-6">
+                  Our AI-powered health assistant can answer your questions and provide general health information. Try
+                  it now!
+                </p>
+                <p className="text-sm text-gray-500">
+                  Note: This is for informational purposes only and does not replace professional medical advice.
+                </p>
+              </div>
+              <div className="md:w-1/2">
+                <HealthAssistantChat />
+              </div>
+            </div>
+          </div>
+        </section>
+      
         <section className="bg-secondary text-white clip-diagonal">
           <div className="container py-16 md:py-24">
             <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
@@ -115,55 +135,25 @@ export default function Home() {
                       Start Symptom Check <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
+                  
                   <Link href="/about">
-                    <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
+                    <Button className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90">
                       Learn More
                     </Button>
                   </Link>
                 </div>
               </div>
               <div className="relative lg:block">
-                <div className="aspect-video rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm">
-                  <img
-                    src="/placeholder.svg?height=400&width=600"
-                    alt="Doctor consulting with patient"
-                    className="w-full h-full object-cover mix-blend-overlay opacity-50"
-                  />
+                <div className="aspect-video rounded-lg overflow-hidden bg-black/10 backdrop-sm">
+                  
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white/90 p-6 rounded-lg max-w-md shadow-lg">
-                      <h3 className="text-secondary font-bold text-xl mb-4">Chat with our Health Assistant</h3>
-                      <div className="bg-gray-50 rounded-lg p-3 mb-4 text-gray-600 text-sm">
-                        <div className="flex items-start gap-2 mb-2">
-                          <MessageCircle className="h-5 w-5 text-primary mt-0.5" />
-                          <p>How can I help you with your health concerns today?</p>
-                        </div>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          type="text"
-                          placeholder="Type your symptoms or questions..."
-                          className="w-full py-2 px-4 pr-10 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
-                        <Button
-                          size="icon"
-                          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 rounded-full bg-primary text-white"
-                        >
-                          <Send className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <span className="px-3 py-1 bg-accent text-primary text-sm rounded-full">Rash</span>
-                        <span className="px-3 py-1 bg-accent text-primary text-sm rounded-full">Fever</span>
-                        <span className="px-3 py-1 bg-accent text-primary text-sm rounded-full">Headache</span>
-                      </div>
-                    </div>
+                    {/* Placeholder for HealthAssistantChat */}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
         <section className="bg-white py-16">
           <div className="container">
             <div className="text-center mb-12">
@@ -184,7 +174,7 @@ export default function Home() {
                 title="Photo Analysis"
                 description="Upload photos of skin conditions for AI-powered analysis"
                 icon="camera"
-                link="/photo-analysis"
+                link="/symptom-checker"
               />
               <ServiceCard
                 title="Health Chat"
