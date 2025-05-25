@@ -55,3 +55,6 @@ Thumbs.db
 *.bak
 *.tmp
 *.orig
+
+venv/
+backend/venv/
