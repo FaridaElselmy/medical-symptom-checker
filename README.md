@@ -26,6 +26,7 @@ medical-symptom-checker/
 
 ---
 
+
 ##  How to Set Up on Another Laptop
 
 ### 1.  Clone the Repository
@@ -37,9 +38,9 @@ cd medical-symptom-checker
 
 ---
 
-### 2.  Backend Setup (FastAPI + TensorFlow)
 
-> 🐍 Requires Python 3.9+ and pip
+### 2.  Backend Setup (FastAPI + TensorFlow)
+>  Requires Python 3.9+ and pip
 
 ```bash
 cd backend
@@ -69,6 +70,7 @@ Go to: [http://localhost:8000/docs](http://localhost:8000/docs) to test the API 
 
 ### 3.  Frontend Setup (Next.js)
 
+
 > 📦 Requires Node.js (v16+) and npm
 
 ```bash
@@ -83,8 +85,9 @@ Open the frontend in your browser: [http://localhost:3000](http://localhost:3000
 
 ### 4.  Model Files
 
-Model files (e.g. `.h5`, `.pb`) are not pushed to GitHub to avoid large repo size.
-👉 Download the model from your cloud storage (e.g. Google Drive, Hugging Face, etc.) and place it in:
+
+Model files are not pushed to GitHub to avoid large repo size.
+Download the model from your cloud storage Hugging Face and place it in:
 
 ```
 backend/model/
@@ -95,6 +98,7 @@ Make sure your `main.py` loads it from the correct path.
 ---
 
 ### 5.  Environment Variables
+
 
 Create a `.env` file **if needed**:
 
@@ -118,14 +122,13 @@ The following folders/files are intentionally excluded from Git:
 
 * `node_modules/`
 * `venv/`
+
 * `*.pth`, `*.tflite`, `.env`, etc.
 
 See `.gitignore` for full details.
 
 ---
 
-## ✨ Author
+## Author
 
 Made by [Farida Elselmy](https://github.com/FaridaElselmy) & SaraAyman
-
-
