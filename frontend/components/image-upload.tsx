@@ -1,10 +1,6 @@
 "use client"
 
-<<<<<<< HEAD
 import { useState, useRef, ChangeEvent } from "react"
-=======
-import { useState, useCallback, ChangeEvent } from "react"
->>>>>>> 5e862f5 (Initial commit)
 import { Upload, X, UploadCloud } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -16,12 +12,9 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const [isLoading, setIsLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
-<<<<<<< HEAD
-  // ✅ This ref is bound to the hidden input
+  //  This ref is bound to the hidden input
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-=======
->>>>>>> 5e862f5 (Initial commit)
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
   }
@@ -51,43 +44,15 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const handleFiles = (files: FileList) => {
     const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
     setImages((prev) => [...prev, ...newImages])
-<<<<<<< HEAD
 
-=======
-    
-    // Process the first file for prediction
->>>>>>> 5e862f5 (Initial commit)
     if (files.length > 0) {
       processImageForPrediction(files[0])
     }
   }
-<<<<<<< HEAD
-=======
-  // Add this utility function
-async function refreshToken() {
-  try {
-    const response = await fetch('http://localhost:8000/refresh-token', {
-      method: 'POST',
-      credentials: 'include'
-    });
-    
-    if (!response.ok) throw new Error("Refresh failed");
-    const { access_token } = await response.json();
-    localStorage.setItem('access_token', access_token);
-    return access_token;
-  } catch (error) {
-    console.error("Token refresh failed:", error);
-    localStorage.removeItem('access_token');
-    throw error;
-  }
-}
-
->>>>>>> 5e862f5 (Initial commit)
 
   const processImageForPrediction = async (file: File) => {
     setIsLoading(true)
     setUploadProgress(0)
-<<<<<<< HEAD
 
     try {
       const formData = new FormData()
@@ -100,26 +65,10 @@ async function refreshToken() {
         },
         body: formData
       })
-=======
-    
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const response = await fetch('http://localhost:8000/predict', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: formData
-      })
-      console.log(response)
->>>>>>> 5e862f5 (Initial commit)
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
         throw new Error(
-<<<<<<< HEAD
           errorData?.detail ||
             `Upload failed with status ${response.status}: ${response.statusText}`
         )
@@ -127,16 +76,6 @@ async function refreshToken() {
 
       const result = await response.json()
       onUploadComplete(result)
-=======
-          errorData?.detail || 
-          `Upload failed with status ${response.status}: ${response.statusText}`
-        )
-      }
-      
-      const result = await response.json()
-      onUploadComplete(result)
-      
->>>>>>> 5e862f5 (Initial commit)
     } catch (error) {
       console.error("Upload error:", error)
       alert(`Upload failed: ${error instanceof Error ? error.message : String(error)}`)
@@ -152,13 +91,9 @@ async function refreshToken() {
         <Label className="text-secondary">Upload Photos of Allergic Reactions or Skin Conditions</Label>
         <div className="grid grid-cols-1 gap-4">
           <div
-<<<<<<< HEAD
             className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${
               dragging ? "border-primary bg-accent" : "hover:bg-muted"
             }`}
-=======
-            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${dragging ? "border-primary bg-accent" : "hover:bg-muted"}`}
->>>>>>> 5e862f5 (Initial commit)
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -186,7 +121,6 @@ async function refreshToken() {
                   </>
                 )}
               </div>
-<<<<<<< HEAD
 
               {/* ✅ Button that triggers the file input */}
               <Button
@@ -204,35 +138,15 @@ async function refreshToken() {
               </Button>
 
               {/* ✅ Hidden file input */}
-=======
->>>>>>> 5e862f5 (Initial commit)
               <input
                 type="file"
                 accept="image/*"
                 multiple
-<<<<<<< HEAD
                 ref={fileInputRef}
                 className="hidden"
                 onChange={handleImageUpload}
                 disabled={isLoading}
               />
-=======
-                className="hidden"
-                id="image-upload"
-                onChange={handleImageUpload}
-                disabled={isLoading}
-              />
-              <Label htmlFor="image-upload" className="cursor-pointer">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Processing..." : "Select Files"}
-                </Button>
-              </Label>
->>>>>>> 5e862f5 (Initial commit)
             </div>
           </div>
 
@@ -304,8 +218,4 @@ async function refreshToken() {
       </div>
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 5e862f5 (Initial commit)

@@ -12,33 +12,20 @@ import { SymptomForm } from "@/components/symptom-form"
 import { ImageUpload } from "@/components/image-upload"
 import { Progress } from "@/components/ui/progress"
 import { Logo } from "@/components/logo"
-<<<<<<< HEAD
 
 
 
-=======
-import { BodyMapSelector } from "@/components/body-map-selector"
->>>>>>> 5e862f5 (Initial commit)
 
 export default function SymptomChecker() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("symptoms")
   const [step, setStep] = useState(1)
-<<<<<<< HEAD
   const [progress, setProgress] = useState(50)
   const [apiPredictions, setApiPredictions] = useState<any[]>([]);
   const handleNext = () => {
     if (step < 2) {
       setStep(step + 1);
       setProgress((step + 1) * 50);
-=======
-  const [progress, setProgress] = useState(33)
-  const [apiPredictions, setApiPredictions] = useState<any[]>([]);
-  const handleNext = () => {
-    if (step < 3) {
-      setStep(step + 1);
-      setProgress((step + 1) * 33);
->>>>>>> 5e862f5 (Initial commit)
     } else {
       // Create URL with query params
       const params = new URLSearchParams();
@@ -51,11 +38,7 @@ export default function SymptomChecker() {
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1)
-<<<<<<< HEAD
       setProgress((step - 1) * 50)
-=======
-      setProgress((step - 1) * 33)
->>>>>>> 5e862f5 (Initial commit)
     }
   }
 
@@ -111,11 +94,7 @@ export default function SymptomChecker() {
       <div className="container max-w-4xl py-8">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-<<<<<<< HEAD
             <h2 className="text-sm font-medium text-secondary">Step {step} of 2</h2>
-=======
-            <h2 className="text-sm font-medium text-secondary">Step {step} of 3</h2>
->>>>>>> 5e862f5 (Initial commit)
             <span className="text-sm text-gray-500">{progress}% Complete</span>
           </div>
           <Progress value={progress} className="h-2" indicatorClassName="bg-primary" />
@@ -124,22 +103,12 @@ export default function SymptomChecker() {
         <div className="flex flex-col items-center text-center mb-8">
           <h1 className="text-3xl font-bold text-secondary mb-4">
             {step === 1 && "Tell Us About Your Symptoms"}
-<<<<<<< HEAD
             {step === 2 && "Additional Information"}
-=======
-            {step === 2 && "Where Are You Experiencing Symptoms?"}
-            {step === 3 && "Additional Information"}
->>>>>>> 5e862f5 (Initial commit)
           </h1>
           <p className="text-gray-600 max-w-[700px]">
             {step === 1 &&
               "Please provide information about your symptoms or upload photos to help identify potential conditions."}
-<<<<<<< HEAD
             {step === 2 && "Just a few more details to help us provide more accurate results."}
-=======
-            {step === 2 && "Select the areas on the body where you're experiencing symptoms."}
-            {step === 3 && "Just a few more details to help us provide more accurate results."}
->>>>>>> 5e862f5 (Initial commit)
           </p>
         </div>
 
@@ -170,21 +139,10 @@ export default function SymptomChecker() {
               </Tabs>
             )}
 
-<<<<<<< HEAD
 
 
             {step === 2 && (
               <div className="space-y-6">
-=======
-            {step === 2 && (
-              <div className="space-y-6">
-                <BodyMapSelector />
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6">
->>>>>>> 5e862f5 (Initial commit)
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-secondary">Medical History</h3>
                   <p className="text-sm text-gray-600">
@@ -237,11 +195,7 @@ export default function SymptomChecker() {
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               <Button onClick={handleNext} className="bg-primary text-white hover:bg-primary/90">
-<<<<<<< HEAD
                 {step === 2 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
-=======
-                {step === 3 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
->>>>>>> 5e862f5 (Initial commit)
               </Button>
             </div>
           </CardContent>
