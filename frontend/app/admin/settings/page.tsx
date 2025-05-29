@@ -36,13 +36,7 @@ export default function SystemSettings() {
     setIsUnsaved(true)
   }
 
-  const handleSave = () => {
-    // In a real app, this would save settings to the backend
-    console.log("Saving settings...")
-    setTimeout(() => {
-      setIsUnsaved(false)
-    }, 1000)
-  }
+
 
   return (
     <div>
@@ -288,7 +282,7 @@ export default function SystemSettings() {
           </div>
         </TabsContent>
 
-        {/* Appearance Settings */}
+  
         <TabsContent value="appearance">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -464,7 +458,7 @@ export default function SystemSettings() {
           </div>
         </TabsContent>
 
-        {/* Simplified tabs for other sections */}
+  
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
