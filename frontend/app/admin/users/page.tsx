@@ -39,7 +39,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Types for user and medical history
+
 interface MedicalHistory {
   id: string
   condition: string
@@ -92,7 +92,7 @@ export default function UsersManagement() {
     fetchUsers()
   }, [])
 
-  // Filter users based on search query and history filter
+  
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -125,14 +125,14 @@ export default function UsersManagement() {
   }
 
   const handleDeleteSelected = () => {
-    // TODO: Implement backend API call to delete users here
+    
     console.log("Deleting users with IDs:", selectedUsers)
     setSelectedUsers([])
   }
 
   return (
     <div>
-      {/* Header */}
+      
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-secondary">User Management</h2>
@@ -146,7 +146,7 @@ export default function UsersManagement() {
         </div>
       </div>
 
-      {/* Controls */}
+      
       <Card className="mb-8">
         <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
@@ -191,7 +191,7 @@ export default function UsersManagement() {
         </CardContent>
       </Card>
 
-      {/* Users Table */}
+      
       <Card>
         <CardHeader className="p-6 pb-3 flex justify-between items-center">
           <div>
@@ -285,14 +285,14 @@ export default function UsersManagement() {
         </CardFooter>
       </Card>
 
-      {/* Add User Dialog */}
+      
       <Dialog open={showAddUserDialog} onOpenChange={setShowAddUserDialog}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
             <DialogDescription>Create a new user account and assign role permissions</DialogDescription>
           </DialogHeader>
-          {/* Add user form can be added here */}
+          
         </DialogContent>
       </Dialog>
     </div>
