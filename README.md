@@ -1,134 +1,137 @@
-# 🩺 Medical Symptom Checker
+MediCheck: AI-Powered Medical Symptom Checker
+MediCheck is an intelligent, full-stack healthcare assistant platform that allows users to check symptoms, upload skin condition images, and chat with an AI-powered medical assistant. It combines a React-based frontend (Next.js) with a FastAPI backend, and integrates powerful machine learning models deployed via Hugging Face for image diagnosis and conversational AI.
 
-An interactive AI-powered symptom checker built with **FastAPI**, **Next.js**, and **TensorFlow**. Users can input symptoms and receive potential diagnoses using a trained machine learning model.
+Overview
+Frontend: Built with Next.js 14 App Router, styled with Tailwind CSS, and deployed on Vercel.
 
----
+Backend: Developed with FastAPI, hosted on Hugging Face Spaces for ML inference and chatbot services.
 
-## 📁 Project Structure
+Machine Learning: Includes a ViT-based skin disease classification model and a RAG-based conversational assistant.
 
-```
+Storage: Optional secure storage using MongoDB Atlas.
 
+Deployment: Utilizes Vercel and Hugging Face for rapid iteration and scalable deployment.
+
+Project Structure
+bash
+Copy
+Edit
 medical-symptom-checker/
 │
-├── backend/              # FastAPI backend (API, ML model)
+├── backend/              # FastAPI backend
 │   ├── main.py
-│   ├── model/            # TensorFlow model directory (not pushed)
-│   └── requirements.txt  # Python dependencies
+│   ├── vitweights/       # Model files (manually downloaded)
+│   └── requirements.txt
 │
-├── frontend/             # Next.js frontend (React)
-│   ├── pages/
+├── frontend/             # Next.js frontend
+│   ├── app/
 │   └── components/
 │
 ├── .gitignore
 ├── README.md
-
-````
-
----
-
-
-##  How to Set Up on Another Laptop
-
-### 1.  Clone the Repository
-
-```bash
+Setup Instructions
+1. Clone the Repository
+bash
+Copy
+Edit
 git clone https://github.com/FaridaElselmy/medical-symptom-checker.git
 cd medical-symptom-checker
-````
+2. Backend Setup
+Requires Python 3.9+
 
----
-
-
-### 2.  Backend Setup (FastAPI + TensorFlow)
->  Requires Python 3.9+ and pip
-
-```bash
+bash
+Copy
+Edit
 cd backend
 python -m venv venv
-# Activate the virtual environment:
-# On Windows:
+Activate the virtual environment:
+
+Windows:
+
+Copy
+Edit
 venv\Scripts\activate
-# On macOS/Linux:
+macOS/Linux:
+
+bash
+Copy
+Edit
 source venv/bin/activate
-```
+Install dependencies:
 
-Install the dependencies:
-
-```bash
+nginx
+Copy
+Edit
 pip install -r requirements.txt
-```
-
 Run the backend server:
 
-```bash
+css
+Copy
+Edit
 uvicorn main:app --reload
-```
+Test API at http://localhost:8000/docs
 
-Go to: [http://localhost:8000/docs](http://localhost:8000/docs) to test the API using Swagger.
+3. Frontend Setup
+Requires Node.js v16+
 
----
-
-### 3.  Frontend Setup (Next.js)
-
-
-> 📦 Requires Node.js (v16+) and npm
-
-```bash
+bash
+Copy
+Edit
 cd ../frontend
 npm install
 npm run dev
-```
+Access the frontend at http://localhost:3000
 
-Open the frontend in your browser: [http://localhost:3000](http://localhost:3000)
+4. Model Files
+Download the trained model and place it in:
 
----
+bash
+Copy
+Edit
+backend/vitweights/
+Ensure main.py loads the model from this directory.
 
-### 4.  Model Files
+5. Environment Configuration
+Backend model loading (backend/utils/predict.py):
 
+python
+Copy
+Edit
+def build_model():
+    model = ViTForImageClassification.from_pretrained(
+        os.path.join(os.path.dirname(__file__), "..", "vitweights"),
+        num_labels=15
+    )
+    return model
+Frontend environment (frontend/.env.local):
 
-Model files are not pushed to GitHub to avoid large repo size.
-Download the model from your cloud storage Hugging Face and place it in:
-
-```
-backend/model/
-```
-
-Make sure your `main.py` loads it from the correct path.
-
----
-
-### 5.  Environment Variables
-
-
-Create a `.env` file **if needed**:
-
-**backend/.env**
-
-```
-MODEL_PATH=model/my_model.h5
-```
-
-**frontend/.env.local**
-
-```
+ini
+Copy
+Edit
 NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+Update this URL for production deployment.
 
----
+Git Ignore Policy
+Files and directories excluded from Git:
 
-##  What’s Ignored
+node_modules/
 
-The following folders/files are intentionally excluded from Git:
+venv/
 
-* `node_modules/`
-* `venv/`
+vitweights/
 
-* `*.pth`, `*.tflite`, `.env`, etc.
+.env, .env.local
 
-See `.gitignore` for full details.
+*.pth, *.tflite
 
----
+See .gitignore for full list.
 
-## Author
+License
+This project is released under the MIT License.
 
-Made by [Farida Elselmy](https://github.com/FaridaElselmy) & SaraAyman
+Authors
+Developed by:
+
+Farida Elselmy (https://github.com/FaridaElselmy)
+
+Sara Ayman (https://github.com/SaraAyman)
