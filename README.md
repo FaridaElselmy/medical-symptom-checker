@@ -113,8 +113,7 @@ You may define variables in  `.env` (backend) if needed for secrets or endpoints
 
 ## 👩‍💻 Authors
 
-* Farida Elselmy – [GitHub](https://github.com/FaridaElselmy)
-* Sara Ayman – [GitHub](https://github.com/SaraAyman)
+* [Farida Elselmy](https://github.com/FaridaElselmy)
+* [Sara Ayman](https://github.com/SaraAyman-204)
 
-```
 
