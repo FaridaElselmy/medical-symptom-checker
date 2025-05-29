@@ -32,14 +32,14 @@ export default function MedicalHistoryPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
-    // Check if user is logged in
+    
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
     if (!isLoggedIn) {
       router.push("/login")
       return
     }
 
-    // Get user data
+    
     const userData = localStorage.getItem("user")
     if (userData) {
       setUser(JSON.parse(userData))
@@ -62,48 +62,7 @@ export default function MedicalHistoryPage() {
     router.push("/")
   }
 
-  // Medical history data
-  const medicalRecords = [
-    {
-      id: "record1",
-      condition: "Contact Dermatitis",
-      date: "April 28, 2025",
-      doctor: "Dr. Sarah Johnson",
-      symptoms: ["Skin rash", "Itching", "Redness"],
-      diagnosis: "Contact dermatitis caused by exposure to irritant in new skincare product.",
-      treatment: "Prescribed hydrocortisone cream and advised to avoid the identified irritant.",
-      notes:
-        "Patient advised to keep the affected area clean and moisturized. Follow-up in 2 weeks if symptoms persist.",
-    },
-    {
-      id: "record2",
-      condition: "Seasonal Allergies",
-      date: "March 15, 2025",
-      doctor: "Dr. James Wilson",
-      symptoms: ["Sneezing", "Runny nose", "Itchy eyes"],
-      diagnosis: "Seasonal allergic rhinitis triggered by spring pollen.",
-      treatment: "Prescribed antihistamine and nasal spray.",
-      notes: "Patient advised to keep windows closed during high pollen days and to shower after outdoor activities.",
-    },
-    {
-      id: "record3",
-      condition: "Influenza",
-      date: "January 10, 2025",
-      doctor: "Dr. Emily Rodriguez",
-      symptoms: ["Fever", "Body aches", "Fatigue", "Cough"],
-      diagnosis: "Influenza A confirmed by rapid test.",
-      treatment: "Prescribed antiviral medication and recommended rest and hydration.",
-      notes: "Patient advised to stay home for at least 24 hours after fever subsides. Follow-up if symptoms worsen.",
-    },
-  ]
-
-  const filteredRecords = medicalRecords.filter(
-    (record) =>
-      record.condition.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.symptoms.some((symptom) => symptom.toLowerCase().includes(searchQuery.toLowerCase())),
-  )
-
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -186,7 +145,7 @@ export default function MedicalHistoryPage() {
         </div>
       </div>
 
-      {/* Main content */}
+
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="container py-4">
