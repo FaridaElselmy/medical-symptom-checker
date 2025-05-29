@@ -24,7 +24,7 @@ interface Prediction {
   link?: string;
 }
 
-// Define condition details that your model doesn't provide
+
 const CONDITION_DETAILS: Record<string, {
   description: string;
   symptoms: string[];
@@ -46,7 +46,7 @@ const CONDITION_DETAILS: Record<string, {
     treatment: "Topical medications, oral antibiotics, laser therapy, avoiding triggers",
     link: "https://www.mayoclinic.org/diseases-conditions/rosacea/symptoms-causes/syc-20353815"
   }
-  // Add more conditions as needed
+  
 }
 
 export default function ResultsPage() {
@@ -63,19 +63,19 @@ export default function ResultsPage() {
     
     const loadPredictions = () => {
       try {
-        // Check URL params first
+        
         const params = new URLSearchParams(window.location.search)
         const predictionsParam = params.get('predictions')
         
         if (predictionsParam) {
-          console.log("Raw predictions from URL:", predictionsParam) // Debug log
+          console.log("Raw predictions from URL:", predictionsParam) 
           const parsed = JSON.parse(predictionsParam)
-          console.log("Parsed predictions:", parsed) // Debug log
+          console.log("Parsed predictions:", parsed) 
           setPredictions(enhancePredictions(parsed))
           return
         }
 
-        // Fallback to localStorage
+        
         const saved = localStorage.getItem('predictions')
         if (saved) {
           const parsed = JSON.parse(saved)
@@ -103,7 +103,7 @@ export default function ResultsPage() {
     }
 
     return rawPredictions.map((pred: any) => {
-      // Get the condition name - handle both 'class' and 'prediction' fields
+      
       const conditionName = (pred.disease || "Unknown Condition").toString()
       const matchedCondition = Object.keys(CONDITION_DETAILS).find(key => 
         conditionName.toLowerCase().includes(key.toLowerCase()) || 
@@ -166,13 +166,13 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-muted">
-      {/* Header remains the same as your original code */}
+      {/*  */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        {/* ... your header content ... */}
+        {/* */}
       </header>
 
       <div className="container max-w-4xl py-8">
-        {/* Results title and disclaimer */}
+        {/**/}
         <div className="flex flex-col items-start mb-8">
           <h1 className="text-3xl font-bold text-secondary mb-4">Your Health Analysis Results</h1>
           <p className="text-gray-600 max-w-[700px]">
@@ -324,9 +324,9 @@ export default function ResultsPage() {
               </div>
             </TabsContent>
 
-            {/* Rest of your tabs content */}
+            {/* */}
             <TabsContent value="next-steps" className="mt-0 space-y-6">
-              {/* ... your next steps content ... */}
+              {/**/}
             </TabsContent>
           </Tabs>
         )}
