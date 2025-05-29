@@ -1,137 +1,120 @@
-MediCheck: AI-Powered Medical Symptom Checker
-MediCheck is an intelligent, full-stack healthcare assistant platform that allows users to check symptoms, upload skin condition images, and chat with an AI-powered medical assistant. It combines a React-based frontend (Next.js) with a FastAPI backend, and integrates powerful machine learning models deployed via Hugging Face for image diagnosis and conversational AI.
+# MediCheck – AI-Powered Symptom Checker & Health Assistant
 
-Overview
-Frontend: Built with Next.js 14 App Router, styled with Tailwind CSS, and deployed on Vercel.
+MediCheck is a full-stack medical platform that combines intelligent symptom checking, skin condition image diagnosis, and a conversational health assistant into one seamless application. It leverages modern technologies including FastAPI, Next.js, Hugging Face Transformers, and Vision Transformers (ViT) to deliver real-time, AI-driven healthcare support.
 
-Backend: Developed with FastAPI, hosted on Hugging Face Spaces for ML inference and chatbot services.
+---
 
-Machine Learning: Includes a ViT-based skin disease classification model and a RAG-based conversational assistant.
+## 🔍 Features
 
-Storage: Optional secure storage using MongoDB Atlas.
+- Symptom Checker form that predicts possible conditions based on user input.
+- Image-based skin disease detection using a ViT model trained on HAM10000 and ISIC datasets.
+- Conversational chatbot assistant with Retrieval-Augmented Generation (RAG) pipeline.
+- Modern frontend using Next.js 14 App Router and Tailwind CSS.
+- Hugging Face backend deployment for both model inference and chatbot logic.
+- Secure data handling and multipart/form-data support for image + text submissions.
 
-Deployment: Utilizes Vercel and Hugging Face for rapid iteration and scalable deployment.
+---
 
-Project Structure
-bash
-Copy
-Edit
+## 🗂️ Project Structure
+
+```
+
 medical-symptom-checker/
 │
-├── backend/              # FastAPI backend
-│   ├── main.py
-│   ├── vitweights/       # Model files (manually downloaded)
-│   └── requirements.txt
+├── backend/                # FastAPI backend with ML logic
+│   ├── main.py             # Main API entry
+│   ├── vitweights/         # Model directory (ViT weights, not committed)
+│   └── requirements.txt    # Python dependencies
 │
-├── frontend/             # Next.js frontend
-│   ├── app/
-│   └── components/
+├── frontend/               # Next.js frontend (React)
+│   ├── app/                # App router pages and routes
+│   └── components/         # Reusable UI components
 │
 ├── .gitignore
 ├── README.md
-Setup Instructions
-1. Clone the Repository
-bash
-Copy
-Edit
+
+````
+
+---
+
+## 🚀 Live Deployment
+
+- Frontend: [https://medical-symptom-checker-five.vercel.app](https://medical-symptom-checker-five.vercel.app)
+- Backend APIs: Hosted on [Hugging Face Spaces](https://huggingface.co/spaces)
+
+---
+
+## ⚙️ Getting Started Locally
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/FaridaElselmy/medical-symptom-checker.git
 cd medical-symptom-checker
-2. Backend Setup
-Requires Python 3.9+
+````
 
-bash
-Copy
-Edit
+---
+
+### 2. Backend Setup (FastAPI + ViT)
+
+> Python 3.9+ required
+
+```bash
 cd backend
 python -m venv venv
-Activate the virtual environment:
-
-Windows:
-
-Copy
-Edit
+# Windows
 venv\Scripts\activate
-macOS/Linux:
-
-bash
-Copy
-Edit
+# macOS/Linux
 source venv/bin/activate
-Install dependencies:
 
-nginx
-Copy
-Edit
 pip install -r requirements.txt
-Run the backend server:
-
-css
-Copy
-Edit
 uvicorn main:app --reload
-Test API at http://localhost:8000/docs
+```
 
-3. Frontend Setup
-Requires Node.js v16+
+Access the backend: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-bash
-Copy
-Edit
+Place your downloaded ViT model in:
+
+```
+backend/vitweights/
+```
+
+Update `main.py` to reflect correct path if needed.
+
+---
+
+### 3. Frontend Setup (Next.js 14)
+
+> Requires Node.js v16+
+
+```bash
 cd ../frontend
 npm install
 npm run dev
-Access the frontend at http://localhost:3000
+```
 
-4. Model Files
-Download the trained model and place it in:
+Open frontend: [http://localhost:3000](http://localhost:3000)
 
-bash
-Copy
-Edit
-backend/vitweights/
-Ensure main.py loads the model from this directory.
 
-5. Environment Configuration
-Backend model loading (backend/utils/predict.py):
 
-python
-Copy
-Edit
-def build_model():
-    model = ViTForImageClassification.from_pretrained(
-        os.path.join(os.path.dirname(__file__), "..", "vitweights"),
-        num_labels=15
-    )
-    return model
-Frontend environment (frontend/.env.local):
+## 📦 Model Architecture
 
-ini
-Copy
-Edit
-NEXT_PUBLIC_API_URL=http://localhost:8000
-Update this URL for production deployment.
+* **ViT-based Classifier**: Fine-tuned Vision Transformer for skin disease classification.
+* **Conversational AI**: Uses HuggingFace’s `all-MiniLM-L6-v2` for semantic embeddings, Pinecone for similarity search, and LangChain with OpenAI for response generation.
+* **Multipart Interoperability**: Text and image fields are combined using `FormData` and handled via FastAPI’s `UploadFile` + `Form`.
 
-Git Ignore Policy
-Files and directories excluded from Git:
+---
 
-node_modules/
+## 🔐 Environment Configuration
 
-venv/
+You may define variables in  `.env` (backend) if needed for secrets or endpoints like we did.
 
-vitweights/
 
-.env, .env.local
 
-*.pth, *.tflite
+## 👩‍💻 Authors
 
-See .gitignore for full list.
+* Farida Elselmy – [GitHub](https://github.com/FaridaElselmy)
+* Sara Ayman – [GitHub](https://github.com/SaraAyman)
 
-License
-This project is released under the MIT License.
+```
 
-Authors
-Developed by:
-
-Farida Elselmy (https://github.com/FaridaElselmy)
-
-Sara Ayman (https://github.com/SaraAyman)
