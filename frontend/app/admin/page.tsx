@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts"
 
-// Analytics mock data
+// this is some mock data added for now
 const userActivityData = [
   { name: "Jan", logins: 120, signups: 40 },
   { name: "Feb", logins: 150, signups: 55 },
@@ -38,7 +38,7 @@ const conditionMatchData = [
   { name: "Acne", value: 15 },
 ]
 
-// Recent users mock data
+
 const recentUsers = [
   { id: 1, name: "Sarah Johnson", email: "sarah.j@example.com", registered: "2 days ago", status: "active" },
   { id: 2, name: "Michael Chen", email: "michael.c@example.com", registered: "5 days ago", status: "active" },
