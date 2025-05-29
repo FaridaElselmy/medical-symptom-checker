@@ -22,25 +22,25 @@ from fastapi import UploadFile, File, Depends, HTTPException
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-# from utils.chatbot import generate_reply  # 👈 adjust path if needed
+
 
 from fastapi import HTTPException, Depends
 from typing import List, Dict, Any
 from bson import ObjectId
-# Load environment variables
+
 load_dotenv()
 
 app = FastAPI()
 
-# Security setup
+
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# MongoDB connection
+
 uri = os.getenv("MONGO_URI")
 
 client = MongoClient(uri, server_api=ServerApi('1'))
@@ -56,13 +56,12 @@ except Exception as e:
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Frontend URL
+    allow_origins=["https://medical-symptom-checker-five.vercel.app/"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Utility functions
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
@@ -97,14 +96,14 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
-# Routes
+
 @app.get("/")
 def home():
     return {"message": "Skin Disease Detection API is running!"}
 
 @app.post("/register")
 async def register(user_data: UserSignup):
-    # Check if user exists
+
     if users.find_one({"email": user_data.email}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -117,9 +116,9 @@ async def register(user_data: UserSignup):
     user_dict.pop("confirmPassword", None)
     user_dict["created_at"] = datetime.now(timezone.utc)
     user_dict["updated_at"] = datetime.now(timezone.utc)
-    user_dict["role"] = "patient"  # Default role
+    user_dict["role"] = "patient" 
     
-    # Insert user
+
     result = users.insert_one(user_dict)
     return {
         "message": "User registered successfully",
@@ -137,7 +136,7 @@ async def verify_token(token: str = Depends(oauth2_scheme)):
         if email is None:
             raise credentials_exception
         
-        # Verify user still exists in database
+    
         user = users.find_one({"email": email})
         if user is None:
             raise credentials_exception
@@ -191,13 +190,13 @@ async def predict(
     current_user: dict = Depends(get_current_user)
 ):
     try:
-        # Save uploaded file temporarily
+        
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
             content = await file.read()
             temp_file.write(content)
             temp_path = temp_file.name
         
-        # Get prediction - this now returns a dict with native Python types
+        
         result = predict_skin_disease(temp_path)
         
         if not result.get("success", False):
@@ -206,7 +205,7 @@ async def predict(
                 detail=result.get("error", "Prediction failed")
             )
         
-        # Save to history
+
         history_record = {
             "user_id": current_user["_id"],
             "prediction": result,
@@ -224,7 +223,7 @@ async def predict(
             detail=f"Server error: {str(e)}"
         )
     finally:
-        # Cleanup temp file
+ 
         if 'temp_path' in locals() and os.path.exists(temp_path):
             os.unlink(temp_path)
 
@@ -255,7 +254,7 @@ async def get_history(current_user: Dict[str, Any] = Depends(get_current_user)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
-# Add this near your other routes in app.py
+
 @app.get("/dashboard-history")
 async def get_dashboard_history(current_user: Dict[str, Any] = Depends(get_current_user)):
     try:
