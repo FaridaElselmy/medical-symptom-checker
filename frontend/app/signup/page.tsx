@@ -1,12 +1,9 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -46,30 +43,32 @@ export default function SignupPage() {
 
     setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      // Store user in localStorage to simulate authentication
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: "user_" + Date.now(),
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          role: "patient",
-        }),
-      )
-
-      localStorage.setItem("isLoggedIn", "true")
-
-      toast({
-        title: "Account created!",
-        description: "Welcome to MediCheck. You are now signed in.",
+    try {
+      const response = await fetch(`https://faridaaaa-medical-diagnosis-api.hf.space/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+        credentials: "include"
       })
 
+      const data = await response.json()
+
+      toast({
+        title: response.ok ? "Signup Successful" : "Signup Failed",
+        description: data.message || data.detail || "Unknown response",
+        variant: response.ok ? "default" : "destructive"
+      })
+
+      if (response.ok) router.push("/login")
+    } catch (error: any) {
+      toast({
+        title: "Signup Error",
+        description: error.message || "Unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-      router.push("/") // Redirect to main page instead of dashboard
-    }, 1500)
+    }
   }
 
   return (
@@ -98,55 +97,39 @@ export default function SignupPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-secondary">
-                    First Name
-                  </Label>
+                  <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
                     name="firstName"
-                    placeholder="John"
                     required
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="border-gray-300 focus:border-primary focus:ring-primary"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-secondary">
-                    Last Name
-                  </Label>
+                  <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
                     name="lastName"
-                    placeholder="Doe"
                     required
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="border-gray-300 focus:border-primary focus:ring-primary"
                   />
                 </div>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-secondary">
-                  Email
-                </Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="name@example.com"
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="border-gray-300 focus:border-primary focus:ring-primary"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-secondary">
-                  Password
-                </Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -155,7 +138,7 @@ export default function SignupPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="border-gray-300 focus:border-primary focus:ring-primary pr-10"
+                    className="pr-10"
                   />
                   <button
                     type="button"
@@ -166,11 +149,8 @@ export default function SignupPage() {
                   </button>
                 </div>
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-secondary">
-                  Confirm Password
-                </Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -178,40 +158,26 @@ export default function SignupPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="border-gray-300 focus:border-primary focus:ring-primary"
                 />
               </div>
-
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    required
-                  />
+                  <input type="checkbox" id="terms" className="h-4 w-4" required />
                   <label htmlFor="terms" className="text-sm text-gray-600">
                     I agree to the{" "}
-                    <Link href="/terms" className="text-primary hover:underline">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy" className="text-primary hover:underline">
-                      Privacy Policy
-                    </Link>
+                    <Link href="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
+                    <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
                   </label>
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-primary text-white hover:bg-primary/90" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>
               <div className="text-center text-sm">
                 <span className="text-gray-600">Already have an account?</span>{" "}
-                <Link href="/login" className="text-primary hover:underline">
-                  Sign in
-                </Link>
+                <Link href="/login" className="text-primary hover:underline">Sign in</Link>
               </div>
             </CardFooter>
           </form>

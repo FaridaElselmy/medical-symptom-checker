@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Eye, EyeOff } from "lucide-react"
@@ -14,8 +12,6 @@ import { Label } from "@/components/ui/label"
 import { Logo } from "@/components/logo"
 import { useToast } from "@/hooks/use-toast"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
-
 export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -24,64 +20,120 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  // Check if user is already logged in
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
-    if (isLoggedIn) {
-      const userData = localStorage.getItem("user")
-      if (userData) {
-        const user = JSON.parse(userData)
-        if (user.role === "admin") {
-          router.push("/admin")
-        } else {
-          router.push("/dashboard")
+    // Verify token validity before redirecting
+    const verifyToken = async () => {
+      const token = localStorage.getItem("access_token")
+      if (token) {
+        try {
+          const response = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/verify-token', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          
+          if (response.ok) {
+            
+            router.push("/dashboard")
+          } else {
+            localStorage.removeItem("access_token")
+            localStorage.removeItem("user")
+          }
+        } catch (error) {
+          localStorage.removeItem("access_token")
+          localStorage.removeItem("user")
         }
       }
     }
+    verifyToken()
   }, [router])
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
+  const handleLogin = async (credentials: { email: string; password: string }) => {
+    try {
+      const response = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      });
+      console.log(response)
+      if (!response.ok) {
+        let errorMessage = 'Login failed';
+        
+        try {
+          const errorData = await response.json();
+          // Handle FastAPI validation errors
+          if (Array.isArray(errorData.detail)) {
+            errorMessage = errorData.detail.map((err: any) => 
+              `${err.loc.join('.')}: ${err.msg}`
+            ).join('\n');
+          } else if (typeof errorData.detail === 'string') {
+            errorMessage = errorData.detail;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (e) {
+          errorMessage = response.statusText || 'Login failed';
+        }
+        
+        throw new Error(errorMessage);
+      }
 
-  try {
-    const res = await fetch(`${API_BASE.replace(/\/$/, "")}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-      // If your backend uses cookies, switch to:
-      // credentials: "include"
-    });
+      const data = await response.json();
+      
+      if (!data.access_token) {
+        throw new Error('No access token received');
+      }
 
-    if (!res.ok) {
-      const msg = await res.text();
-      throw new Error(msg || `Login failed (${res.status})`);
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('isLoggedIn', 'true');
+      return data;
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
+  };
 
-    // Expected response shape (adjust mapping if yours differs):
-    // { token: string, user: { id, firstName, lastName, email, role } }
-    const data = await res.json();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
 
-    // Persist auth for the dashboard pages
-    localStorage.setItem("authToken", data.token);            // <-- token used by the fetch in medical-history
-    localStorage.setItem("user", JSON.stringify(data.user));  // firstName/lastName/email/role
-    localStorage.setItem("isLoggedIn", "true");
+    try {
+      const credentials = { email, password };
+      const data = await handleLogin(credentials);
 
-    toast({ title: "Welcome back!", description: "You are now logged in." });
+      toast({
+        title: "Login successful",
+        description: "You are now logged in to your account.",
+      });
 
-    // Route by role
-    if (data.user?.role === "admin") router.push("/admin");
-    else router.push("/dashboard");
-  } catch (err: any) {
-    toast({
-      title: "Login failed",
-      description: err?.message || "Please check your email/password.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      router.push(user.role === 'admin' ? '/admin' : '/dashboard');
+      
+    } catch (error: any) {
+      let errorMessage = "Invalid email or password. Please try again.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Login failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
-};
+
+
 
   return (
     <div className="min-h-screen bg-muted flex flex-col">
@@ -108,9 +160,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-secondary">
-                  Email
-                </Label>
+                <Label htmlFor="email" className="text-secondary">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -123,9 +173,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-secondary">
-                    Password
-                  </Label>
+                  <Label htmlFor="password" className="text-secondary">Password</Label>
                   <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                     Forgot password?
                   </Link>
@@ -154,9 +202,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   id="remember"
                   className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
-                <Label htmlFor="remember" className="text-sm text-gray-600">
-                  Remember me
-                </Label>
+                <Label htmlFor="remember" className="text-sm text-gray-600">Remember me</Label>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
@@ -173,35 +219,13 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Button variant="outline" type="button" className="border-gray-300">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
                   </svg>
                   Facebook
                 </Button>
                 <Button variant="outline" type="button" className="border-gray-300">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2"
-                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                     <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
                   </svg>
                   Google
@@ -209,15 +233,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               </div>
               <div className="text-center text-sm mt-4">
                 <span className="text-gray-600">Don't have an account?</span>{" "}
-                <Link href="/signup" className="text-primary hover:underline">
-                  Sign up
-                </Link>
-              </div>
-
-              {/* Admin login hint for the demo */}
-              <div className="text-center text-xs mt-6 p-2 bg-gray-50 rounded-md">
-                <p className="text-gray-500">Demo Admin Login:</p>
-                <p className="text-gray-600 font-medium">admin@medicheck.com / admin123</p>
+                <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
               </div>
             </CardFooter>
           </form>

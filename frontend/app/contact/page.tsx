@@ -27,6 +27,9 @@ export default function ContactPage() {
               <Link href="/contact" className="text-white text-sm hover:underline">
                 Contact
               </Link>
+              <Link href="/register" className="text-white text-sm hover:underline">
+                Register
+              </Link>
             </div>
           </div>
         </div>
@@ -396,3 +399,4 @@ export default function ContactPage() {
     </div>
   )
 }
+

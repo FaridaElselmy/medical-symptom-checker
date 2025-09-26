@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   Calendar,
   ChevronDown,
@@ -15,166 +15,60 @@ import {
   User,
   FileIcon as FileHistory,
   Search,
-} from "lucide-react";
+} from "lucide-react"
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Logo } from "@/components/logo";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Logo } from "@/components/logo"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-type MedicalRecord = {
-  id: string;
-  condition: string;
-  date: string; // ISO string or readable date
-  doctor: string;
-  symptoms: string[];
-  diagnosis?: string;
-  treatment?: string;
-  notes?: string;
-};
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL; // e.g. "https://api.mediscan.eu.org"
 
 export default function MedicalHistoryPage() {
-  const router = useRouter();
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [expandedRecord, setExpandedRecord] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [fetching, setFetching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [records, setRecords] = useState<MedicalRecord[]>([]);
-  const [expandedRecord, setExpandedRecord] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // ---- auth / gate ----
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
     if (!isLoggedIn) {
-      router.push("/login");
-      return;
+      router.push("/login")
+      return
     }
 
-    const userData = localStorage.getItem("user");
-    if (userData) setUser(JSON.parse(userData));
-
-    setLoading(false);
-  }, [router]);
-
-  // ---- fetch records ----
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (loading) return;
-    if (!API_BASE) {
-      setError(
-        "API base URL is missing. Set NEXT_PUBLIC_API_BASE_URL in your env."
-      );
-      return;
+    
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      setUser(JSON.parse(userData))
     }
 
-    const run = async () => {
-      setError(null);
-      setFetching(true);
-
-      try {
-        // If you store token under another key, change here.
-        const token =
-          localStorage.getItem("authToken") ||
-          localStorage.getItem("token") ||
-          "";
-
-        // optional: build query param for server-side filtering
-        const url = new URL(`${API_BASE.replace(/\/$/, "")}/medical-records`);
-        if (searchQuery.trim()) url.searchParams.set("search", searchQuery);
-
-        const res = await fetch(url.toString(), {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          // If your API is on another domain and you set cookies there:
-          // credentials: "include",
-        });
-
-        if (!res.ok) {
-          const msg = await safeText(res);
-          throw new Error(
-            `Fetch failed (${res.status})${
-              msg ? `: ${msg}` : ""
-            }`
-          );
-        }
-
-        const data: MedicalRecord[] = await res.json();
-
-        // Defensive: normalize fields we rely on
-        const safe = (data ?? []).map((r) => ({
-          id: r.id,
-          condition: r.condition ?? "Unknown",
-          date: r.date ?? "",
-          doctor: r.doctor ?? "—",
-          symptoms: Array.isArray(r.symptoms) ? r.symptoms : [],
-          diagnosis: r.diagnosis ?? "",
-          treatment: r.treatment ?? "",
-          notes: r.notes ?? "",
-        }));
-
-        setRecords(safe);
-      } catch (e: any) {
-        setError(e?.message ?? "Failed to load medical records.");
-      } finally {
-        setFetching(false);
-      }
-    };
-
-    // debounce when typing in the search box (300ms)
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(run, 300);
-
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, [loading, searchQuery]);
+    setLoading(false)
+  }, [router])
 
   const toggleRecord = (id: string) => {
-    setExpandedRecord((cur) => (cur === id ? null : id));
-  };
+    if (expandedRecord === id) {
+      setExpandedRecord(null)
+    } else {
+      setExpandedRecord(id)
+    }
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    router.push("/");
-  };
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("user")
+    router.push("/")
+  }
 
-  // client-side filtering (kept, in case your backend doesn’t support ?search)
-  const filteredRecords = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return records;
-    return records.filter(
-      (r) =>
-        r.condition.toLowerCase().includes(q) ||
-        r.doctor.toLowerCase().includes(q) ||
-        r.symptoms?.some((s) => s.toLowerCase().includes(q))
-    );
-  }, [records, searchQuery]);
-
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -198,10 +92,7 @@ export default function MedicalHistoryPage() {
           </div>
 
           <nav className="space-y-1">
-            <Link
-              href="/dashboard"
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary-700"
-            >
+            <Link href="/dashboard" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary-700">
               <LayoutDashboard className="h-5 w-5" />
               <span>Dashboard</span>
             </Link>
@@ -254,7 +145,7 @@ export default function MedicalHistoryPage() {
         </div>
       </div>
 
-      {/* Main content */}
+
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="container py-4">
@@ -262,9 +153,7 @@ export default function MedicalHistoryPage() {
               <div className="md:hidden">
                 <Logo />
               </div>
-              <h1 className="text-xl font-bold text-secondary hidden md:block">
-                Medical History
-              </h1>
+              <h1 className="text-xl font-bold text-secondary hidden md:block">Medical History</h1>
               <div className="flex items-center gap-4">
                 <Button
                   variant="outline"
@@ -282,15 +171,12 @@ export default function MedicalHistoryPage() {
 
         <main className="flex-1 p-6">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-secondary mb-4">
-              Medical History
-            </h2>
+            <h2 className="text-2xl font-bold text-secondary mb-4">Medical History</h2>
             <p className="text-gray-600 mb-6">
-              View your complete medical history, including past diagnoses,
-              treatments, and consultations.
+              View your complete medical history, including past diagnoses, treatments, and consultations.
             </p>
 
-            <div className="relative mb-4">
+            <div className="relative mb-6">
               <Input
                 type="text"
                 placeholder="Search medical records..."
@@ -300,16 +186,6 @@ export default function MedicalHistoryPage() {
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
-
-            {error && (
-              <div className="mb-4 text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            {fetching && (
-              <div className="mb-4 text-sm text-gray-500">Loading records…</div>
-            )}
 
             <Tabs defaultValue="all">
               <TabsList className="mb-6">
@@ -326,9 +202,7 @@ export default function MedicalHistoryPage() {
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-lg font-medium text-secondary">
-                              {record.condition}
-                            </CardTitle>
+                            <CardTitle className="text-lg font-medium text-secondary">{record.condition}</CardTitle>
                             <CardDescription>
                               {record.date} • {record.doctor}
                             </CardDescription>
@@ -338,11 +212,6 @@ export default function MedicalHistoryPage() {
                             size="sm"
                             onClick={() => toggleRecord(record.id)}
                             className="p-0 h-8 w-8"
-                            aria-label={
-                              expandedRecord === record.id
-                                ? "Collapse"
-                                : "Expand"
-                            }
                           >
                             {expandedRecord === record.id ? (
                               <ChevronUp className="h-5 w-5" />
@@ -354,11 +223,8 @@ export default function MedicalHistoryPage() {
                       </CardHeader>
                       <CardContent className="pb-3">
                         <div className="flex flex-wrap gap-2 mb-2">
-                          {(record.symptoms ?? []).map((symptom, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-1 bg-accent text-primary text-xs rounded-full"
-                            >
+                          {record.symptoms.map((symptom, index) => (
+                            <span key={index} className="px-2 py-1 bg-accent text-primary text-xs rounded-full">
                               {symptom}
                             </span>
                           ))}
@@ -367,51 +233,32 @@ export default function MedicalHistoryPage() {
                         {expandedRecord === record.id && (
                           <div className="mt-4 space-y-4 animate-in fade-in-50 duration-300">
                             <div>
-                              <h4 className="text-sm font-medium text-secondary mb-1">
-                                Diagnosis
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                {record.diagnosis || "—"}
-                              </p>
+                              <h4 className="text-sm font-medium text-secondary mb-1">Diagnosis</h4>
+                              <p className="text-sm text-gray-600">{record.diagnosis}</p>
                             </div>
                             <div>
-                              <h4 className="text-sm font-medium text-secondary mb-1">
-                                Treatment
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                {record.treatment || "—"}
-                              </p>
+                              <h4 className="text-sm font-medium text-secondary mb-1">Treatment</h4>
+                              <p className="text-sm text-gray-600">{record.treatment}</p>
                             </div>
                             <div>
-                              <h4 className="text-sm font-medium text-secondary mb-1">
-                                Notes
-                              </h4>
-                              <p className="text-sm text-gray-600">
-                                {record.notes || "—"}
-                              </p>
+                              <h4 className="text-sm font-medium text-secondary mb-1">Notes</h4>
+                              <p className="text-sm text-gray-600">{record.notes}</p>
                             </div>
                           </div>
                         )}
                       </CardContent>
                       <CardFooter className="pt-0">
-                        <Link
-                          href={`/dashboard/medical-history/${record.id}`}
-                          className="text-primary text-sm"
-                        >
+                        <Button variant="link" className="p-0 h-auto text-primary">
                           View full record
-                        </Link>
+                        </Button>
                       </CardFooter>
                     </Card>
                   ))
                 ) : (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-secondary mb-2">
-                      No records found
-                    </h3>
-                    <p className="text-gray-600">
-                      No medical records match your search criteria.
-                    </p>
+                    <h3 className="text-lg font-medium text-secondary mb-2">No records found</h3>
+                    <p className="text-gray-600">No medical records match your search criteria.</p>
                   </div>
                 )}
               </TabsContent>
@@ -419,36 +266,24 @@ export default function MedicalHistoryPage() {
               <TabsContent value="conditions">
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-secondary mb-2">
-                    Conditions
-                  </h3>
-                  <p className="text-gray-600">
-                    View your diagnosed conditions here.
-                  </p>
+                  <h3 className="text-lg font-medium text-secondary mb-2">Conditions</h3>
+                  <p className="text-gray-600">View your diagnosed conditions here.</p>
                 </div>
               </TabsContent>
 
               <TabsContent value="consultations">
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-secondary mb-2">
-                    Consultations
-                  </h3>
-                  <p className="text-gray-600">
-                    View your past consultations here.
-                  </p>
+                  <h3 className="text-lg font-medium text-secondary mb-2">Consultations</h3>
+                  <p className="text-gray-600">View your past consultations here.</p>
                 </div>
               </TabsContent>
 
               <TabsContent value="treatments">
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-secondary mb-2">
-                    Treatments
-                  </h3>
-                  <p className="text-gray-600">
-                    View your treatment history here.
-                  </p>
+                  <h3 className="text-lg font-medium text-secondary mb-2">Treatments</h3>
+                  <p className="text-gray-600">View your treatment history here.</p>
                 </div>
               </TabsContent>
             </Tabs>
@@ -456,14 +291,5 @@ export default function MedicalHistoryPage() {
         </main>
       </div>
     </div>
-  );
-}
-
-/** Read response text safely without throwing if body is empty */
-async function safeText(res: Response) {
-  try {
-    return await res.text();
-  } catch {
-    return "";
-  }
+  )
 }

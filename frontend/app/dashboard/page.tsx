@@ -1,148 +1,118 @@
-"use client";
+"use client"
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, FileText, LogOut, Search, User } from "lucide-react";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { ChevronDown, ChevronUp, FileText, LogOut, Search, User } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Logo } from "@/components/logo"
+import { useToast } from "@/hooks/use-toast"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Logo } from "@/components/logo";
-import { useToast } from "@/hooks/use-toast";
-
-type MedicalRecord = {
+interface MedicalRecord {
   id: string;
   condition: string;
-  date: string;       // ISO string or readable date
-  doctor: string;
+  confidence: number;
+  date: string;
   symptoms: string[];
-  diagnosis?: string;
-  treatment?: string;
-  notes?: string;
-};
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL; // set in .env.local
+  diagnosis: string;
+  treatment: string;
+  notes: string;
+}
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const { toast } = useToast();
-
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);     // initial gate spinner
-  const [fetching, setFetching] = useState(false);  // API spinner
-  const [error, setError] = useState<string | null>(null);
-
-  const [records, setRecords] = useState<MedicalRecord[]>([]);
-  const [expandedRecord, setExpandedRecord] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // --- auth gate ---
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!isLoggedIn) {
-      router.push("/login");
-      return;
-    }
-    const userData = localStorage.getItem("user");
-    if (userData) setUser(JSON.parse(userData));
-    setLoading(false);
-  }, [router]);
-
-  // --- fetch from FastAPI (debounced on search) ---
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter()
+  const { toast } = useToast()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [expandedRecord, setExpandedRecord] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
 
   useEffect(() => {
-    if (loading) return;
-    if (!API_BASE) {
-      setError("Missing NEXT_PUBLIC_API_BASE_URL in .env.local");
-      return;
-    }
+    const verifyAuth = async () => {
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        router.push("/login")
+        return
+      }
 
-    const load = async () => {
-      setFetching(true);
-      setError(null);
       try {
-        const token =
-          localStorage.getItem("authToken") ||
-          localStorage.getItem("token") ||
-          "";
-
-        const url = new URL(`${API_BASE.replace(/\/$/, "")}/medical-records`);
-        if (searchQuery.trim()) url.searchParams.set("search", searchQuery.trim());
-
-        const res = await fetch(url.toString(), {
-          method: "GET",
+        // Verify token
+        const verifyResponse = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/verify-token', {
           headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          // If FastAPI uses cookie auth instead:
-          // credentials: "include",
-        });
-
-        if (!res.ok) {
-          const msg = await safeText(res);
-          throw new Error(msg || `Failed to load records (${res.status})`);
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        
+        if (!verifyResponse.ok) {
+          throw new Error('Invalid token')
         }
 
-        const data: any[] = await res.json();
+        // Get user data
+        const userData = localStorage.getItem("user")
+        if (userData) {
+          setUser(JSON.parse(userData))
+        }
 
-        // map/normalize in case field names differ
-        const safe: MedicalRecord[] = (data ?? []).map((r) => ({
-          id: String(r.id),
-          condition: r.condition ?? r.diagnosis_name ?? "Unknown",
-          date: r.date ?? r.created_at ?? "",
-          doctor: r.doctor ?? r.doctor_name ?? "—",
-          symptoms: Array.isArray(r.symptoms) ? r.symptoms : (r.symptoms?.split?.(",") ?? []),
-          diagnosis: r.diagnosis ?? r.assessment ?? "",
-          treatment: r.treatment ?? r.plan ?? "",
-          notes: r.notes ?? "",
-        }));
+        // Fetch medical history
+        const historyResponse = await fetch('https://faridaaaa-medical-diagnosis-api.hf.space/dashboard-history', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
 
-        setRecords(safe);
-      } catch (e: any) {
-        setError(e?.message || "Unable to load medical records.");
+        if (!historyResponse.ok) {
+          throw new Error('Failed to fetch history')
+        }
+
+        const historyData = await historyResponse.json()
+        setMedicalRecords(historyData)
+      } catch (error) {
+        console.error("Dashboard error:", error)
+        toast({
+          title: "Session expired",
+          description: "Please login again",
+          variant: "destructive"
+        })
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("user")
+        router.push("/login")
       } finally {
-        setFetching(false);
+        setLoading(false)
       }
-    };
+    }
 
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(load, 300);
-
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [loading, searchQuery]);
-
-  const filteredRecords = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return records;
-    return records.filter(
-      (r) =>
-        r.condition.toLowerCase().includes(q) ||
-        r.doctor.toLowerCase().includes(q) ||
-        r.symptoms.some((s) => s.toLowerCase().includes(q))
-    );
-  }, [records, searchQuery]);
-
-  const toggleRecord = (id: string) =>
-    setExpandedRecord((cur) => (cur === id ? null : id));
+    verifyAuth()
+  }, [router, toast])
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    toast({ title: "Logged out", description: "You have been successfully logged out." });
-    router.push("/");
-  };
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("user")
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    })
+    router.push("/")
+  }
+
+  const toggleRecord = (id: string) => {
+    setExpandedRecord(expandedRecord === id ? null : id)
+  }
+
+  const filteredRecords = medicalRecords.filter(
+    (record) =>
+      record.condition.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.diagnosis.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.symptoms.some((symptom) => symptom.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -187,7 +157,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="relative mb-3">
+          <div className="relative mb-6">
             <Input
               type="text"
               placeholder="Search medical records..."
@@ -198,9 +168,6 @@ export default function DashboardPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
 
-          {fetching && <p className="text-sm text-gray-500 mb-3">Loading records…</p>}
-          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-
           <div className="space-y-4">
             {filteredRecords.length > 0 ? (
               filteredRecords.map((record) => (
@@ -208,9 +175,14 @@ export default function DashboardPage() {
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg font-medium text-secondary">{record.condition}</CardTitle>
+                        <CardTitle className="text-lg font-medium text-secondary">
+                          {record.condition}
+                          <span className="ml-2 text-sm font-normal text-primary">
+                            ({Math.round(record.confidence * 100)}% confidence)
+                          </span>
+                        </CardTitle>
                         <CardDescription>
-                          {record.date} • {record.doctor}
+                          {record.date}
                         </CardDescription>
                       </div>
                       <Button variant="ghost" size="sm" onClick={() => toggleRecord(record.id)} className="p-0 h-8 w-8">
@@ -223,44 +195,46 @@ export default function DashboardPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="pb-3">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {(record.symptoms ?? []).map((symptom, i) => (
-                        <span key={i} className="px-2 py-1 bg-accent text-primary text-xs rounded-full">
-                          {symptom}
-                        </span>
-                      ))}
-                    </div>
+                    {record.symptoms.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {record.symptoms.map((symptom, index) => (
+                          <span key={index} className="px-2 py-1 bg-accent text-primary text-xs rounded-full">
+                            {symptom}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
                     {expandedRecord === record.id && (
                       <div className="mt-4 space-y-4 animate-in fade-in-50 duration-300">
                         <div>
                           <h4 className="text-sm font-medium text-secondary mb-1">Diagnosis</h4>
-                          <p className="text-sm text-gray-600">{record.diagnosis || "—"}</p>
+                          <p className="text-sm text-gray-600">{record.diagnosis}</p>
                         </div>
                         <div>
                           <h4 className="text-sm font-medium text-secondary mb-1">Treatment</h4>
-                          <p className="text-sm text-gray-600">{record.treatment || "—"}</p>
+                          <p className="text-sm text-gray-600">{record.treatment}</p>
                         </div>
                         <div>
                           <h4 className="text-sm font-medium text-secondary mb-1">Notes</h4>
-                          <p className="text-sm text-gray-600">{record.notes || "—"}</p>
+                          <p className="text-sm text-gray-600">{record.notes}</p>
                         </div>
                       </div>
                     )}
                   </CardContent>
-                  <CardFooter className="pt-0">
-                    <Button variant="link" className="p-0 h-auto text-primary">
-                      <FileText className="h-4 w-4 mr-2" />
-                      View full record
-                    </Button>
-                  </CardFooter>
                 </Card>
               ))
             ) : (
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-secondary mb-2">No records found</h3>
-                <p className="text-gray-600">No medical records match your search criteria.</p>
+                <h3 className="text-lg font-medium text-secondary mb-2">
+                  {medicalRecords.length === 0 ? "No medical records yet" : "No matching records found"}
+                </h3>
+                <p className="text-gray-600">
+                  {medicalRecords.length === 0 
+                    ? "Your medical history will appear here after using our services." 
+                    : "Try a different search term."}
+                </p>
               </div>
             )}
           </div>
@@ -277,13 +251,5 @@ export default function DashboardPage() {
         </div>
       </footer>
     </div>
-  );
-}
-
-async function safeText(res: Response) {
-  try {
-    return await res.text();
-  } catch {
-    return "";
-  }
+  )
 }

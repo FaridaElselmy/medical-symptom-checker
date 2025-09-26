@@ -175,3 +175,4 @@ export function SymptomForm() {
     </div>
   )
 }
+

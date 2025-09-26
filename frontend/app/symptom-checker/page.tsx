@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, Info } from "lucide-react"
-
+import { UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -12,27 +12,33 @@ import { SymptomForm } from "@/components/symptom-form"
 import { ImageUpload } from "@/components/image-upload"
 import { Progress } from "@/components/ui/progress"
 import { Logo } from "@/components/logo"
-import { BodyMapSelector } from "@/components/body-map-selector"
+
+
+
 
 export default function SymptomChecker() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("symptoms")
   const [step, setStep] = useState(1)
-  const [progress, setProgress] = useState(33)
-
+  const [progress, setProgress] = useState(50)
+  const [apiPredictions, setApiPredictions] = useState<any[]>([]);
   const handleNext = () => {
-    if (step < 3) {
-      setStep(step + 1)
-      setProgress((step + 1) * 33)
+    if (step < 2) {
+      setStep(step + 1);
+      setProgress((step + 1) * 50);
     } else {
-      router.push("/symptom-checker/results")
+      // Create URL with query params
+      const params = new URLSearchParams();
+      params.set('predictions', JSON.stringify(apiPredictions));
+      
+      router.push(`/symptom-checker/results?${params.toString()}`);
     }
-  }
+  };
 
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1)
-      setProgress((step - 1) * 33)
+      setProgress((step - 1) * 50)
     }
   }
 
@@ -88,7 +94,7 @@ export default function SymptomChecker() {
       <div className="container max-w-4xl py-8">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-sm font-medium text-secondary">Step {step} of 3</h2>
+            <h2 className="text-sm font-medium text-secondary">Step {step} of 2</h2>
             <span className="text-sm text-gray-500">{progress}% Complete</span>
           </div>
           <Progress value={progress} className="h-2" indicatorClassName="bg-primary" />
@@ -97,14 +103,12 @@ export default function SymptomChecker() {
         <div className="flex flex-col items-center text-center mb-8">
           <h1 className="text-3xl font-bold text-secondary mb-4">
             {step === 1 && "Tell Us About Your Symptoms"}
-            {step === 2 && "Where Are You Experiencing Symptoms?"}
-            {step === 3 && "Additional Information"}
+            {step === 2 && "Additional Information"}
           </h1>
           <p className="text-gray-600 max-w-[700px]">
             {step === 1 &&
               "Please provide information about your symptoms or upload photos to help identify potential conditions."}
-            {step === 2 && "Select the areas on the body where you're experiencing symptoms."}
-            {step === 3 && "Just a few more details to help us provide more accurate results."}
+            {step === 2 && "Just a few more details to help us provide more accurate results."}
           </p>
         </div>
 
@@ -127,18 +131,17 @@ export default function SymptomChecker() {
                   <SymptomForm />
                 </TabsContent>
                 <TabsContent value="photos" className="mt-0 space-y-4">
-                  <ImageUpload />
+                  <ImageUpload 
+                    onUploadComplete={(result) => {
+                      setApiPredictions([result]);
+                    }}/>
                 </TabsContent>
               </Tabs>
             )}
 
-            {step === 2 && (
-              <div className="space-y-6">
-                <BodyMapSelector />
-              </div>
-            )}
 
-            {step === 3 && (
+
+            {step === 2 && (
               <div className="space-y-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-secondary">Medical History</h3>
@@ -192,7 +195,7 @@ export default function SymptomChecker() {
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               <Button onClick={handleNext} className="bg-primary text-white hover:bg-primary/90">
-                {step === 3 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
+                {step === 2 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </CardContent>

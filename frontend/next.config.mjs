@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,  
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -9,6 +10,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
 
-export default nextConfig
+  experimental: {
+    allowedOrigins: ['local-origin.dev', '*.local-origin.dev']
+  }
+  
+};
+
+export default nextConfig;  // ES modules syntax for .mjs

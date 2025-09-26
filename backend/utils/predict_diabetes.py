@@ -18,12 +18,12 @@ features_path = os.path.join(WEIGHTS_DIR, "selected_feature_names (1).pkl")
 
 def predict_diabetes(input_data: dict):
     try:
-        # === ADD THESE LINES - Load models only when function is called ===
+        
         pipeline = joblib.load(pipeline_path)
         best_threshold = joblib.load(threshold_path)
         selected_features = joblib.load(features_path)
         
-        # Rest of your existing code below...
+        
         # Normalize keys to lowercase
         input_data = {k.lower(): v for k, v in input_data.items()}
 

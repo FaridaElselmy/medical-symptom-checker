@@ -124,3 +124,4 @@ export function ConditionMatch({ name, matchPercentage, description, symptoms, l
     </motion.div>
   )
 }
+

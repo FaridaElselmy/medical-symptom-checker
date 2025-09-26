@@ -73,3 +73,8 @@
 .clip-diagonal-top {
   clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
 }
+
+/* in your globals.css or a local component style */
+div[data-nextjs-dev-overlay] {
+  display: none !important;
+}

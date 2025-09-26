@@ -1,9 +1,9 @@
 "use server"
 
-// Mock health assistant response function
+
 export async function getHealthAssistantResponse(message: string) {
   try {
-    // Convert message to lowercase for easier matching
+    
     const query = message.toLowerCase()
 
     // Common health questions and answers
@@ -41,7 +41,7 @@ export async function getHealthAssistantResponse(message: string) {
     let responseText =
       "I'm here to provide general health information. For specific medical concerns, please consult with a healthcare professional. How else can I help you with your health questions?"
 
-    // Check if any key phrases are in the query
+    
     for (const [key, response] of Object.entries(responses)) {
       if (query.includes(key)) {
         responseText = response
@@ -49,7 +49,7 @@ export async function getHealthAssistantResponse(message: string) {
       }
     }
 
-    // Simulate network delay
+    
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     return {
