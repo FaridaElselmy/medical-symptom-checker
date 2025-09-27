@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Save,
   Settings,
@@ -15,38 +15,30 @@ import {
   AlertTriangle,
   Upload,
   Check,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function SystemSettings() {
-  const [defaultTab, setDefaultTab] = useState("general")
-  const [maintenanceMode, setMaintenanceMode] = useState(false)
-  const [isUnsaved, setIsUnsaved] = useState(false)
+  const [defaultTab, setDefaultTab] = useState("general");
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [isUnsaved, setIsUnsaved] = useState(false);
 
-  const handleInputChange = () => {
-    setIsUnsaved(true)
-  }
+  const handleInputChange = () => setIsUnsaved(true);
 
-<<<<<<< HEAD
   const handleSave = () => {
-    // In a real app, this would save settings to the backend
-    console.log("Saving settings...")
-    setTimeout(() => {
-      setIsUnsaved(false)
-    }, 1000)
-  }
-=======
-
->>>>>>> upstream/main
+    // TODO: call your backend to persist settings
+    console.log("Saving settings...");
+    setTimeout(() => setIsUnsaved(false), 800);
+  };
 
   return (
     <div>
@@ -71,7 +63,7 @@ export default function SystemSettings() {
         </div>
       </div>
 
-      <Tabs defaultValue={defaultTab} onValueChange={setDefaultTab} className="space-y-6">
+      <Tabs value={defaultTab} onValueChange={setDefaultTab} className="space-y-6">
         <div className="bg-white rounded-md border shadow-sm">
           <div className="p-1">
             <TabsList className="grid grid-cols-1 md:grid-cols-6 h-auto p-1">
@@ -103,7 +95,7 @@ export default function SystemSettings() {
           </div>
         </div>
 
-        {/* General Settings */}
+        {/* General */}
         <TabsContent value="general">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -131,18 +123,13 @@ export default function SystemSettings() {
 
                   <div className="space-y-2">
                     <Label htmlFor="support-email">Support Email</Label>
-                    <Input
-                      id="support-email"
-                      type="email"
-                      defaultValue="support@medicheck.com"
-                      onChange={handleInputChange}
-                    />
+                    <Input id="support-email" type="email" defaultValue="support@medicheck.com" onChange={handleInputChange} />
                     <p className="text-sm text-gray-500">Email address for user support inquiries.</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="timezone">Default Timezone</Label>
-                    <Select defaultValue="UTC-5" onValueChange={handleInputChange}>
+                    <Select defaultValue="UTC" onValueChange={() => setIsUnsaved(true)}>
                       <SelectTrigger id="timezone">
                         <SelectValue placeholder="Select a timezone" />
                       </SelectTrigger>
@@ -159,7 +146,7 @@ export default function SystemSettings() {
 
                   <div className="space-y-2">
                     <Label htmlFor="date-format">Date Format</Label>
-                    <Select defaultValue="MM/DD/YYYY" onValueChange={handleInputChange}>
+                    <Select defaultValue="DD/MM/YYYY" onValueChange={() => setIsUnsaved(true)}>
                       <SelectTrigger id="date-format">
                         <SelectValue placeholder="Select date format" />
                       </SelectTrigger>
@@ -189,8 +176,8 @@ export default function SystemSettings() {
                       id="maintenance-mode"
                       checked={maintenanceMode}
                       onCheckedChange={(checked) => {
-                        setMaintenanceMode(checked)
-                        setIsUnsaved(true)
+                        setMaintenanceMode(checked);
+                        setIsUnsaved(true);
                       }}
                     />
                   </div>
@@ -203,9 +190,7 @@ export default function SystemSettings() {
                         defaultValue="Our system is currently undergoing scheduled maintenance. We'll be back shortly. Thank you for your patience."
                         onChange={handleInputChange}
                       />
-                      <p className="text-sm text-gray-500">
-                        This message will be displayed to users during maintenance.
-                      </p>
+                      <p className="text-sm text-gray-500">This message will be displayed to users during maintenance.</p>
                     </div>
                   )}
 
@@ -214,7 +199,7 @@ export default function SystemSettings() {
                       <Label htmlFor="debug-mode">Debug Mode</Label>
                       <p className="text-sm text-gray-500">Enable detailed error messages and logging</p>
                     </div>
-                    <Switch id="debug-mode" onCheckedChange={handleInputChange} />
+                    <Switch id="debug-mode" onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -224,7 +209,7 @@ export default function SystemSettings() {
                         Allow the system to update automatically when new versions are available
                       </p>
                     </div>
-                    <Switch id="auto-updates" defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch id="auto-updates" defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                 </CardContent>
               </Card>
@@ -292,11 +277,7 @@ export default function SystemSettings() {
           </div>
         </TabsContent>
 
-<<<<<<< HEAD
-        {/* Appearance Settings */}
-=======
-  
->>>>>>> upstream/main
+        {/* Appearance */}
         <TabsContent value="appearance">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -309,13 +290,7 @@ export default function SystemSettings() {
                   <div className="space-y-2">
                     <Label htmlFor="primary-color">Primary Color</Label>
                     <div className="flex gap-4 items-center">
-                      <Input
-                        id="primary-color"
-                        type="color"
-                        defaultValue="#00843D"
-                        className="w-16 h-10 p-1"
-                        onChange={handleInputChange}
-                      />
+                      <Input id="primary-color" type="color" defaultValue="#00843D" className="w-16 h-10 p-1" onChange={handleInputChange} />
                       <Input value="#00843D" className="w-32" readOnly />
                     </div>
                     <p className="text-sm text-gray-500">Main brand color used throughout the platform.</p>
@@ -324,13 +299,7 @@ export default function SystemSettings() {
                   <div className="space-y-2">
                     <Label htmlFor="secondary-color">Secondary Color</Label>
                     <div className="flex gap-4 items-center">
-                      <Input
-                        id="secondary-color"
-                        type="color"
-                        defaultValue="#002855"
-                        className="w-16 h-10 p-1"
-                        onChange={handleInputChange}
-                      />
+                      <Input id="secondary-color" type="color" defaultValue="#002855" className="w-16 h-10 p-1" onChange={handleInputChange} />
                       <Input value="#002855" className="w-32" readOnly />
                     </div>
                     <p className="text-sm text-gray-500">Secondary brand color used throughout the platform.</p>
@@ -349,9 +318,7 @@ export default function SystemSettings() {
                         Upload New Logo
                       </Button>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      Upload your organization's logo (recommended size: 200x200px).
-                    </p>
+                    <p className="text-sm text-gray-500">Upload your organization's logo (recommended size: 200x200px).</p>
                   </div>
 
                   <div className="space-y-2">
@@ -365,9 +332,7 @@ export default function SystemSettings() {
                         Upload New Favicon
                       </Button>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      Upload a favicon for browser tabs (recommended size: 32x32px).
-                    </p>
+                    <p className="text-sm text-gray-500">Upload a favicon for browser tabs (recommended size: 32x32px).</p>
                   </div>
                 </CardContent>
               </Card>
@@ -383,7 +348,7 @@ export default function SystemSettings() {
                       <Label>Dark Mode Support</Label>
                       <p className="text-sm text-gray-500">Allow users to switch to dark mode</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -391,7 +356,7 @@ export default function SystemSettings() {
                       <Label>Compact Layout</Label>
                       <p className="text-sm text-gray-500">Reduce spacing for a more compact interface</p>
                     </div>
-                    <Switch onCheckedChange={handleInputChange} />
+                    <Switch onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -399,12 +364,12 @@ export default function SystemSettings() {
                       <Label>Show User Avatars</Label>
                       <p className="text-sm text-gray-500">Display user avatars instead of initials</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="font-family">Font Family</Label>
-                    <Select defaultValue="inter" onValueChange={handleInputChange}>
+                    <Select defaultValue="inter" onValueChange={() => setIsUnsaved(true)}>
                       <SelectTrigger id="font-family">
                         <SelectValue placeholder="Select a font" />
                       </SelectTrigger>
@@ -441,28 +406,16 @@ export default function SystemSettings() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div
-                      className="bg-[#00843D] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-primary"
-                      onClick={handleInputChange}
-                    >
+                    <div className="bg-[#00843D] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-primary" onClick={handleInputChange}>
                       <span className="font-semibold">Green</span>
                     </div>
-                    <div
-                      className="bg-[#0067B1] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-blue-600"
-                      onClick={handleInputChange}
-                    >
+                    <div className="bg-[#0067B1] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-blue-600" onClick={handleInputChange}>
                       <span className="font-semibold">Blue</span>
                     </div>
-                    <div
-                      className="bg-[#8A2BE2] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-purple-600"
-                      onClick={handleInputChange}
-                    >
+                    <div className="bg-[#8A2BE2] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-purple-600" onClick={handleInputChange}>
                       <span className="font-semibold">Purple</span>
                     </div>
-                    <div
-                      className="bg-[#F97316] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-orange-600"
-                      onClick={handleInputChange}
-                    >
+                    <div className="bg-[#F97316] text-white h-20 rounded-lg flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-orange-600" onClick={handleInputChange}>
                       <span className="font-semibold">Orange</span>
                     </div>
                   </div>
@@ -472,11 +425,7 @@ export default function SystemSettings() {
           </div>
         </TabsContent>
 
-<<<<<<< HEAD
-        {/* Simplified tabs for other sections */}
-=======
-  
->>>>>>> upstream/main
+        {/* Notifications */}
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -492,21 +441,21 @@ export default function SystemSettings() {
                       <Label>User Registration</Label>
                       <p className="text-sm text-gray-500">Send welcome email when new users register</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Symptom Check Results</Label>
                       <p className="text-sm text-gray-500">Email users their symptom check results</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>System Alerts</Label>
                       <p className="text-sm text-gray-500">Email administrators about system issues</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                 </div>
               </div>
@@ -519,14 +468,14 @@ export default function SystemSettings() {
                       <Label>New User Alerts</Label>
                       <p className="text-sm text-gray-500">Notify when new users register</p>
                     </div>
-                    <Switch onCheckedChange={handleInputChange} />
+                    <Switch onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>System Error Alerts</Label>
                       <p className="text-sm text-gray-500">Notify on critical system errors</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                 </div>
               </div>
@@ -534,6 +483,7 @@ export default function SystemSettings() {
           </Card>
         </TabsContent>
 
+        {/* Security */}
         <TabsContent value="security">
           <Card>
             <CardHeader>
@@ -549,21 +499,21 @@ export default function SystemSettings() {
                       <Label>Two-Factor Authentication</Label>
                       <p className="text-sm text-gray-500">Require 2FA for all admin accounts</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Password Expiration</Label>
                       <p className="text-sm text-gray-500">Force password changes every 90 days</p>
                     </div>
-                    <Switch defaultChecked onCheckedChange={handleInputChange} />
+                    <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Minimum Password Length</Label>
-                <Select defaultValue="8" onValueChange={handleInputChange}>
+                <Select defaultValue="8" onValueChange={() => setIsUnsaved(true)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select length" />
                   </SelectTrigger>
@@ -579,6 +529,7 @@ export default function SystemSettings() {
           </Card>
         </TabsContent>
 
+        {/* Integrations */}
         <TabsContent value="integrations">
           <Card>
             <CardHeader>
@@ -664,18 +615,20 @@ export default function SystemSettings() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label>Enable API Access</Label>
-                          <Switch defaultChecked onChange={handleInputChange} />
+                          <Switch defaultChecked onCheckedChange={() => setIsUnsaved(true)} />
                         </div>
                         <p className="text-sm text-gray-500">Allow external services to access the API</p>
                       </div>
                       <div className="space-y-2">
                         <Label>API Key</Label>
                         <div className="flex gap-2">
-                          <Input defaultValue="STRIPE_KEY_REMOVED" readOnly />
-                          <Button variant="outline" size="sm">
-                            Regenerate
-                          </Button>
+                          {/* Do NOT hardcode real keys here */}
+                          <Input placeholder="Set & store on server only" readOnly />
+                          <Button variant="outline" size="sm">Regenerate</Button>
                         </div>
+                        <p className="text-xs text-gray-500">
+                          Store secrets in server env vars. Never ship real keys to the client.
+                        </p>
                       </div>
                     </div>
                   </AccordionContent>
@@ -685,6 +638,7 @@ export default function SystemSettings() {
           </Card>
         </TabsContent>
 
+        {/* Content */}
         <TabsContent value="content">
           <Card>
             <CardHeader>
@@ -718,5 +672,5 @@ export default function SystemSettings() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
