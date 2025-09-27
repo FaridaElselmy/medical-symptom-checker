@@ -27,12 +27,17 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status
 from models import DiabetesInput
 from utils.predict_diabetes import predict_diabetes
+from models import KidneyDiseaseInput  
+from utils.predict_kidney import predict_kidney_disease  
 
 
 from fastapi import HTTPException, Depends
 from typing import List, Dict, Any
 from bson import ObjectId
 from fastapi.middleware.cors import CORSMiddleware
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -378,6 +383,47 @@ async def predict_diabetes_endpoint(
     except HTTPException:
         raise
     except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Server error: {str(e)}"
+        )
+    
+@app.post("/predict-kidney")
+async def predict_kidney_endpoint(
+    data: KidneyDiseaseInput, 
+    current_user: dict = Depends(get_current_user)
+):
+    """Predict chronic kidney disease based on patient data"""
+    logger.info("🔍 Kidney disease prediction request received")
+    
+    try:
+        # Convert Pydantic model to dict
+        input_data = data.dict()
+        
+        # Call the actual prediction function from predict_kidney.py
+        result = predict_kidney_disease(input_data)
+        
+        if not result.get("success", False):
+            raise HTTPException(
+                status_code=400,
+                detail=result.get("error", "Kidney disease prediction failed")
+            )
+        
+        # Save to history
+        history_record = {
+            "user_id": current_user["_id"],
+            "prediction": result,
+            "type": "kidney",
+            "created_at": datetime.now(timezone.utc)
+        }
+        history_collection.insert_one(history_record)
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Kidney prediction error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Server error: {str(e)}"
