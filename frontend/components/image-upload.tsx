@@ -1,46 +1,35 @@
 "use client"
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-import type React from "react"
-
-import { useState } from "react"
-import { Upload, X } from "lucide-react"
-
-=======
-=======
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
-import { useState, useRef, ChangeEvent } from "react"
+import { useState, useRef, ChangeEvent, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Upload, X, UploadCloud } from "lucide-react"
->>>>>>> upstream/main
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
-<<<<<<< HEAD
-export function ImageUpload() {
-  const [images, setImages] = useState<string[]>([])
-  const [dragging, setDragging] = useState(false)
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newImages = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
-      setImages((prev) => [...prev, ...newImages])
-    }
-  }
-=======
 export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: any) => void }) {
   const [images, setImages] = useState<string[]>([])
   const [dragging, setDragging] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+  const router = useRouter()
 
-  // ✅ This ref is bound to the hidden input
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-<<<<<<< HEAD
->>>>>>> upstream/main
-=======
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = () => {
+      if (typeof window === "undefined") return false
+      
+      const token = localStorage.getItem("access_token")
+      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true"
+      
+      return !!(token && isLoggedIn)
+    }
+    
+    setIsAuthenticated(checkAuth())
+  }, [])
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index))
@@ -59,16 +48,24 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setDragging(false)
-<<<<<<< HEAD
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newImages = Array.from(e.dataTransfer.files).map((file) => URL.createObjectURL(file))
-      setImages((prev) => [...prev, ...newImages])
-=======
+    
+    if (!isAuthenticated) {
+      alert("Please log in to upload images")
+      router.push("/login")
+      return
+    }
+    
     handleFiles(e.dataTransfer.files)
   }
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!isAuthenticated) {
+      alert("Please log in to upload images")
+      router.push("/login")
+      e.target.value = ""
+      return
+    }
+
     if (e.target.files) {
       handleFiles(e.target.files)
     }
@@ -78,28 +75,50 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
     const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
     setImages((prev) => [...prev, ...newImages])
 
-    if (files.length > 0) {
-      processImageForPrediction(files[0])
-    }
+    // Process ALL files instead of just the first one
+    Array.from(files).forEach((file) => {
+      processImageForPrediction(file)
+    })
   }
 
   const processImageForPrediction = async (file: File) => {
+    if (!isAuthenticated) {
+      alert("Please log in to upload images")
+      router.push("/login")
+      return
+    }
+
     setIsLoading(true)
     setUploadProgress(0)
 
     try {
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        throw new Error("No authentication token found")
+      }
+
       const formData = new FormData()
       formData.append("file", file)
 
       const response = await fetch("https://faridaaaa-medical-diagnosis-api.hf.space/predict", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+          Authorization: `Bearer ${token}`
         },
         body: formData
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          // Token is invalid - clear storage and redirect
+          localStorage.removeItem("access_token")
+          localStorage.removeItem("isLoggedIn")
+          setIsAuthenticated(false)
+          alert("Your session has expired. Please log in again.")
+          router.push("/login")
+          return
+        }
+        
         const errorData = await response.json().catch(() => null)
         throw new Error(
           errorData?.detail ||
@@ -115,8 +134,31 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
     } finally {
       setIsLoading(false)
       setUploadProgress(null)
->>>>>>> upstream/main
     }
+  }
+
+  // If not authenticated, show login prompt
+  if (!isAuthenticated) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label className="text-secondary">Upload Photos of Allergic Reactions or Skin Conditions</Label>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <UploadCloud className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-yellow-800 mb-2">Authentication Required</h3>
+            <p className="text-yellow-700 mb-4">
+              Please log in to upload and analyze images for medical diagnosis.
+            </p>
+            <Button 
+              onClick={() => router.push("/login")}
+              className="bg-primary text-white hover:bg-primary/90"
+            >
+              Go to Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -125,33 +167,14 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
         <Label className="text-secondary">Upload Photos of Allergic Reactions or Skin Conditions</Label>
         <div className="grid grid-cols-1 gap-4">
           <div
-<<<<<<< HEAD
-<<<<<<< HEAD
-            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${dragging ? "border-primary bg-accent" : "hover:bg-muted"}`}
-=======
             className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${
               dragging ? "border-primary bg-accent" : "hover:bg-muted"
-            }`}
->>>>>>> upstream/main
-=======
-            className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 cursor-pointer transition-all duration-200 ${
-              dragging ? "border-primary bg-accent" : "hover:bg-muted"
-            }`}
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
+            } ${isLoading ? "opacity-50" : ""}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
             <div className="flex flex-col items-center justify-center space-y-3">
-<<<<<<< HEAD
-              <div className={`rounded-full p-4 ${dragging ? "bg-accent" : "bg-muted"}`}>
-                <Upload className={`h-8 w-8 ${dragging ? "text-primary" : "text-gray-400"}`} />
-              </div>
-              <div className="text-center">
-                <p className="text-base font-medium text-secondary">Drag and drop your images here</p>
-                <p className="text-sm text-gray-500">or click to browse files</p>
-              </div>
-=======
               <div className={`rounded-full p-4 ${dragging || isLoading ? "bg-accent" : "bg-muted"}`}>
                 {isLoading ? (
                   <UploadCloud className="h-8 w-8 text-primary animate-pulse" />
@@ -162,7 +185,7 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
               <div className="text-center">
                 {isLoading ? (
                   <>
-                    <p className="text-base font-medium text-secondary">Analyzing image...</p>
+                    <p className="text-base font-medium text-secondary">Analyzing images...</p>
                     <p className="text-sm text-gray-500">Please wait</p>
                   </>
                 ) : (
@@ -175,14 +198,11 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
                 )}
               </div>
 
-              {/* ✅ Button that triggers the file input */}
               <Button
                 variant="outline"
                 type="button"
                 className="border-primary text-primary hover:bg-primary hover:text-white"
                 onClick={() => {
-                  console.log("Clicking file input...");
-                  console.log("Ref value:", fileInputRef.current);
                   fileInputRef.current?.click();
                 }}
                 disabled={isLoading}
@@ -190,42 +210,15 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
                 {isLoading ? "Processing..." : "Select Files"}
               </Button>
 
-              {/* ✅ Hidden file input */}
-<<<<<<< HEAD
->>>>>>> upstream/main
-=======
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
               <input
                 type="file"
                 accept="image/*"
                 multiple
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-                ref={fileInputRef}
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
-                className="hidden"
-                onChange={handleImageUpload}
-              />
-<<<<<<< HEAD
-              <Label htmlFor="image-upload" className="cursor-pointer">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
-                >
-                  Select Files
-                </Button>
-              </Label>
-=======
                 ref={fileInputRef}
                 className="hidden"
                 onChange={handleImageUpload}
                 disabled={isLoading}
               />
->>>>>>> upstream/main
-=======
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
             </div>
           </div>
 
@@ -248,14 +241,11 @@ export function ImageUpload({ onUploadComplete }: { onUploadComplete: (result: a
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-<<<<<<< HEAD
-=======
                   {index === 0 && isLoading && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <div className="text-white text-sm">Analyzing...</div>
                     </div>
                   )}
->>>>>>> upstream/main
                 </div>
               ))}
             </div>

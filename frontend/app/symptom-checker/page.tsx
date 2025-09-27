@@ -4,11 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight, Info } from "lucide-react"
-<<<<<<< HEAD
-
-=======
 import { UploadCloud } from "lucide-react";
->>>>>>> upstream/main
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -16,45 +12,15 @@ import { SymptomForm } from "@/components/symptom-form"
 import { ImageUpload } from "@/components/image-upload"
 import { Progress } from "@/components/ui/progress"
 import { Logo } from "@/components/logo"
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { BodyMapSelector } from "@/components/body-map-selector"
-=======
-
-
-
->>>>>>> upstream/main
-=======
-
-
-
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
 
 export default function SymptomChecker() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("symptoms")
   const [step, setStep] = useState(1)
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const [progress, setProgress] = useState(33)
+  const [progress, setProgress] = useState(50)
+  const [apiPredictions, setApiPredictions] = useState<any[]>([]);
 
   const handleNext = () => {
-    if (step < 3) {
-      setStep(step + 1)
-      setProgress((step + 1) * 33)
-    } else {
-      router.push("/symptom-checker/results")
-    }
-  }
-=======
-  const [progress, setProgress] = useState(50)
-  const [apiPredictions, setApiPredictions] = useState<any[]>([]);
-  const handleNext = () => {
-=======
-  const [progress, setProgress] = useState(50)
-  const [apiPredictions, setApiPredictions] = useState<any[]>([]);
-  const handleNext = () => {
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
     if (step < 2) {
       setStep(step + 1);
       setProgress((step + 1) * 50);
@@ -66,20 +32,11 @@ export default function SymptomChecker() {
       router.push(`/symptom-checker/results?${params.toString()}`);
     }
   };
->>>>>>> upstream/main
 
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1)
-<<<<<<< HEAD
-<<<<<<< HEAD
-      setProgress((step - 1) * 33)
-=======
       setProgress((step - 1) * 50)
->>>>>>> upstream/main
-=======
-      setProgress((step - 1) * 50)
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
     }
   }
 
@@ -135,15 +92,7 @@ export default function SymptomChecker() {
       <div className="container max-w-4xl py-8">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <h2 className="text-sm font-medium text-secondary">Step {step} of 3</h2>
-=======
             <h2 className="text-sm font-medium text-secondary">Step {step} of 2</h2>
->>>>>>> upstream/main
-=======
-            <h2 className="text-sm font-medium text-secondary">Step {step} of 2</h2>
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
             <span className="text-sm text-gray-500">{progress}% Complete</span>
           </div>
           <Progress value={progress} className="h-2" indicatorClassName="bg-primary" />
@@ -152,30 +101,12 @@ export default function SymptomChecker() {
         <div className="flex flex-col items-center text-center mb-8">
           <h1 className="text-3xl font-bold text-secondary mb-4">
             {step === 1 && "Tell Us About Your Symptoms"}
-<<<<<<< HEAD
-<<<<<<< HEAD
-            {step === 2 && "Where Are You Experiencing Symptoms?"}
-            {step === 3 && "Additional Information"}
-=======
             {step === 2 && "Additional Information"}
->>>>>>> upstream/main
-=======
-            {step === 2 && "Additional Information"}
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
           </h1>
           <p className="text-gray-600 max-w-[700px]">
             {step === 1 &&
               "Please provide information about your symptoms or upload photos to help identify potential conditions."}
-<<<<<<< HEAD
-<<<<<<< HEAD
-            {step === 2 && "Select the areas on the body where you're experiencing symptoms."}
-            {step === 3 && "Just a few more details to help us provide more accurate results."}
-=======
             {step === 2 && "Just a few more details to help us provide more accurate results."}
->>>>>>> upstream/main
-=======
-            {step === 2 && "Just a few more details to help us provide more accurate results."}
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
           </p>
         </div>
 
@@ -198,37 +129,16 @@ export default function SymptomChecker() {
                   <SymptomForm />
                 </TabsContent>
                 <TabsContent value="photos" className="mt-0 space-y-4">
-<<<<<<< HEAD
-                  <ImageUpload />
-=======
                   <ImageUpload 
                     onUploadComplete={(result) => {
-                      setApiPredictions([result]);
+                      // ✅ FIXED: Now accumulates predictions instead of replacing
+                      setApiPredictions(prev => [...prev, result]);
                     }}/>
->>>>>>> upstream/main
                 </TabsContent>
               </Tabs>
             )}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             {step === 2 && (
-              <div className="space-y-6">
-                <BodyMapSelector />
-              </div>
-            )}
-
-            {step === 3 && (
-=======
-
-
-            {step === 2 && (
->>>>>>> upstream/main
-=======
-
-
-            {step === 2 && (
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
               <div className="space-y-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-secondary">Medical History</h3>
@@ -282,15 +192,7 @@ export default function SymptomChecker() {
                 <ChevronLeft className="mr-2 h-4 w-4" /> Back
               </Button>
               <Button onClick={handleNext} className="bg-primary text-white hover:bg-primary/90">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                {step === 3 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
-=======
                 {step === 2 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
->>>>>>> upstream/main
-=======
-                {step === 2 ? "Get Results" : "Continue"} <ChevronRight className="ml-2 h-4 w-4" />
->>>>>>> 4986183a3d38b9da26557962b3fdef98b79f9f60
               </Button>
             </div>
           </CardContent>
