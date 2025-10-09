@@ -170,21 +170,6 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {[
                 {
-<<<<<<< HEAD
-                  name: "Dr. Sarah Johnson",
-                  role: "Chief Medical Officer",
-                  image: "/placeholder.svg?height=300&width=300",
-                },
-                {
-                  name: "Michael Chen",
-                  role: "Chief Technology Officer",
-                  image: "/placeholder.svg?height=300&width=300",
-                },
-                { name: "Dr. James Wilson", role: "Medical Director", image: "/placeholder.svg?height=300&width=300" },
-                {
-                  name: "Emily Rodriguez",
-                  role: "Head of User Experience",
-=======
                   name: "Eng Farida Elselmy",
                   role: "Software developer",
                   image: "/placeholder.jpg?height=300&width=300",
@@ -198,7 +183,6 @@ export default function AboutPage() {
                 {
                   name: "Nour Elhadidy",
                   role: "DL eng",
->>>>>>> upstream/main
                   image: "/placeholder.svg?height=300&width=300",
                 },
               ].map((member, index) => (
@@ -386,7 +370,3 @@ export default function AboutPage() {
     </div>
   )
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
